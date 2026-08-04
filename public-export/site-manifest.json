@@ -7,11 +7,11 @@
     "interfaceName": "Common Crypto API",
     "repository": "common-crypto-api-caap"
   },
-  "status": "draft",
-  "sourceCommit": null,
+  "status": "reviewed",
+  "sourceCommit": "1b8ff53246a1e9452e4757c8391b1c5c00728f71",
   "review": {
-    "reviewedBy": null,
-    "reviewedAt": null
+    "reviewedBy": "Ganesh Mallaya",
+    "reviewedAt": "2026-08-04T07:26:52Z"
   },
   "targets": [
     "/research/",
@@ -20,7 +20,7 @@
   "files": [
     {
       "path": "site-summary.md",
-      "contentSha256": null
+      "contentSha256": "7904eea59dd3ff663e1a5c69f354b84231d69dc43dc4352146418dd373aba471"
     }
   ]
 }
