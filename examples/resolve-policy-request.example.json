@@ -1,0 +1,20 @@
+{
+  "$schema": "../schemas/protocol-envelope.schema.json",
+  "kind": "request",
+  "apiVersion": "0.1.0-experimental",
+  "requestId": "example-request-0001",
+  "operation": "ResolvePolicy",
+  "intent": "artifact-signing",
+  "expectedPolicy": {
+    "profileId": "example-artifact-signing",
+    "profileVersion": "draft-1"
+  },
+  "minimumConstraints": {
+    "keyProperties": [
+      "tenant-bound"
+    ]
+  },
+  "input": {
+    "environment": "example-only"
+  }
+}

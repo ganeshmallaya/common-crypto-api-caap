@@ -1,0 +1,22 @@
+{
+  "$schema": "../schemas/protocol-envelope.schema.json",
+  "kind": "response",
+  "apiVersion": "0.1.0-experimental",
+  "requestId": "example-request-0001",
+  "operation": "ResolvePolicy",
+  "outcome": "success",
+  "policy": {
+    "profileId": "example-artifact-signing",
+    "profileVersion": "draft-1"
+  },
+  "algorithm": {
+    "namespace": "https://example.invalid/caap/algorithm",
+    "identifier": "signature-example-a"
+  },
+  "providerRef": null,
+  "result": {
+    "decisionOnly": true,
+    "note": "Example response; no cryptographic operation was performed."
+  },
+  "error": null
+}

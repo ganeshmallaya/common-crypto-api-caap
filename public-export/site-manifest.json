@@ -1,0 +1,26 @@
+{
+  "$schema": "../schemas/site-manifest.schema.json",
+  "schemaVersion": "1.0.0",
+  "project": {
+    "canonicalName": "Crypto Agility Algorithm Protocol",
+    "abbreviation": "CAAP",
+    "interfaceName": "Common Crypto API",
+    "repository": "common-crypto-api-caap"
+  },
+  "status": "draft",
+  "sourceCommit": null,
+  "review": {
+    "reviewedBy": null,
+    "reviewedAt": null
+  },
+  "targets": [
+    "/research/",
+    "/research/crypto-agility-algorithm-protocol/"
+  ],
+  "files": [
+    {
+      "path": "site-summary.md",
+      "contentSha256": null
+    }
+  ]
+}

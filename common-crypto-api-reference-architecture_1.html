@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Common Crypto API — Reference Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e17;
+    --panel:#10192a;
+    --panel-2:#0d1626;
+    --panel-3:#0c1320;
+    --border:#223049;
+    --border-hi:#2e4568;
+    --text:#dce3ec;
+    --dim:#8092ab;
+    --dim2:#54637d;
+    --cyan:#4fd8e6;
+    --amber:#f2b84b;
+    --green:#59d9a0;
+    --violet:#9d8cf5;
+    --rose:#f2779a;
+    --grid:rgba(79,216,230,0.045);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 12% -2%, rgba(79,216,230,0.06), transparent 38%),
+      radial-gradient(circle at 90% 6%, rgba(157,140,245,0.05), transparent 40%),
+      radial-gradient(circle at 80% 100%, rgba(89,217,160,0.045), transparent 45%),
+      var(--bg);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .grid-overlay{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:46px 46px;}
+  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:3.2rem 1.6rem 5rem;}
+
+  /* ---- header ---- */
+  header{margin-bottom:2.6rem;border-bottom:1px solid var(--border);padding-bottom:2.2rem;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;
+    color:var(--cyan);margin:0 0 1rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;}
+  .eyebrow::before{content:'';width:24px;height:1px;background:var(--cyan);display:inline-block;}
+  .eyebrow .rev{color:var(--dim2);border:1px solid var(--border);border-radius:4px;padding:0.1rem 0.45rem;letter-spacing:0.08em;}
+  h1{font-size:clamp(1.8rem,3.6vw,2.7rem);font-weight:600;margin:0 0 0.7rem;letter-spacing:-0.015em;line-height:1.12;}
+  h1 .wn{font-size:0.5em;font-weight:400;color:var(--dim);letter-spacing:0;vertical-align:middle;font-family:'IBM Plex Mono',monospace;}
+  .lede{color:var(--dim);font-size:1rem;max-width:760px;line-height:1.65;margin:0;}
+  .meta-row{display:flex;gap:2rem;flex-wrap:wrap;margin-top:1.5rem;}
+  .meta-row div{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--dim2);}
+  .meta-row div b{color:var(--dim);display:block;margin-bottom:0.15rem;font-weight:500;letter-spacing:0.05em;}
+
+  section{margin-top:3.2rem;}
+  .sec-head{display:flex;align-items:baseline;gap:0.9rem;margin-bottom:1.4rem;}
+  .sec-num{font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:0.15rem 0.5rem;flex-shrink:0;}
+  .sec-head h2{font-size:1.25rem;font-weight:600;margin:0;letter-spacing:-0.01em;}
+  .sec-head .h2sub{color:var(--dim2);font-size:0.85rem;margin-left:auto;font-family:'IBM Plex Mono',monospace;}
+
+  /* ---- thesis band ---- */
+  .thesis{display:grid;grid-template-columns:1fr auto 1fr;gap:1.2rem;align-items:stretch;}
+  .contract{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1.3rem 1.4rem;position:relative;overflow:hidden;}
+  .contract.north{border-top:2px solid var(--cyan);}
+  .contract.south{border-top:2px solid var(--green);}
+  .contract .lbl{font-family:'IBM Plex Mono',monospace;font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;}
+  .contract.north .lbl{color:var(--cyan);}
+  .contract.south .lbl{color:var(--green);}
+  .contract .nm{font-weight:600;font-size:1.02rem;margin-bottom:0.4rem;}
+  .contract .ds{color:var(--dim);font-size:0.85rem;line-height:1.55;}
+  .contract .ops{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--dim2);margin-top:0.7rem;line-height:1.7;}
+  .thesis-core{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 0.5rem;}
+  .thesis-core .box{background:linear-gradient(160deg,#14243a,#0e1a2e);border:1.5px solid var(--cyan);border-radius:10px;padding:1rem 1.1rem;text-align:center;box-shadow:0 0 28px rgba(79,216,230,0.12);}
+  .thesis-core .box .t{font-weight:600;font-size:0.9rem;}
+  .thesis-core .box .s{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--dim2);margin-top:0.3rem;}
+  .thesis-core .updown{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--dim2);margin:0.5rem 0;letter-spacing:0.1em;}
+
+  /* ---- main stack ---- */
+  .plane{background:var(--panel-3);border:1px solid var(--border);border-radius:12px;margin-bottom:0.8rem;overflow:hidden;transition:border-color .2s;}
+  .plane:hover{border-color:var(--border-hi);}
+  .plane-head{display:flex;align-items:center;gap:0.8rem;padding:0.8rem 1.2rem;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.01);}
+  .plane-head .tag{font-family:'IBM Plex Mono',monospace;font-size:0.66rem;letter-spacing:0.1em;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;flex-shrink:0;}
+  .plane-head .ttl{font-weight:600;font-size:0.95rem;}
+  .plane-head .role{color:var(--dim2);font-size:0.78rem;margin-left:auto;font-family:'IBM Plex Mono',monospace;text-align:right;}
+  .tag-consumer{background:rgba(157,140,245,0.14);color:var(--violet);}
+  .tag-interface{background:rgba(79,216,230,0.14);color:var(--cyan);}
+  .tag-core{background:rgba(242,184,75,0.14);color:var(--amber);}
+  .tag-provider{background:rgba(89,217,160,0.14);color:var(--green);}
+  .tag-control{background:rgba(242,119,154,0.14);color:var(--rose);}
+
+  .tiles{display:grid;gap:0.55rem;padding:1rem 1.2rem;}
+  .tiles.c6{grid-template-columns:repeat(6,1fr);}
+  .tiles.c5{grid-template-columns:repeat(5,1fr);}
+  .tiles.c4{grid-template-columns:repeat(4,1fr);}
+  .tiles.c3{grid-template-columns:repeat(3,1fr);}
+  .tile{background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:0.6rem 0.65rem;transition:border-color .15s,background .15s,transform .15s;cursor:default;}
+  .tile:hover{border-color:var(--cyan);background:#122032;transform:translateY(-1px);}
+  .tile .n{font-weight:600;font-size:0.78rem;line-height:1.2;}
+  .tile .m{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--dim2);margin-top:0.28rem;line-height:1.35;}
+  .tile.hw{border-style:dashed;}
+  .tile.highlight{border-color:var(--amber);background:rgba(242,184,75,0.06);}
+  .tile.highlight:hover{border-color:var(--amber);}
+
+  .flow-sep{display:flex;align-items:center;justify-content:center;gap:0.7rem;padding:0.15rem 0;color:var(--dim2);}
+  .flow-sep .line{height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--dim2),transparent);}
+  .flow-sep .txt{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;}
+  .flow-sep .arrow{font-size:0.8rem;}
+
+  .control-note,.core-note{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--dim2);padding:0 1.2rem 1rem;line-height:1.6;}
+
+  .callout{display:flex;gap:0.9rem;background:rgba(242,184,75,0.05);border:1px solid rgba(242,184,75,0.25);border-radius:9px;padding:0.9rem 1.1rem;margin-top:0.9rem;}
+  .callout .k{font-family:'IBM Plex Mono',monospace;font-size:0.64rem;color:var(--bg);background:var(--amber);padding:0.22rem 0.5rem;border-radius:4px;font-weight:600;white-space:nowrap;height:fit-content;}
+  .callout .v{font-size:0.85rem;color:var(--dim);line-height:1.6;}
+  .callout .v b{color:var(--text);}
+
+  /* ---- topology cards ---- */
+  .topo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;}
+  .topo{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.1rem 1.2rem;transition:border-color .18s,transform .18s;}
+  .topo:hover{border-color:var(--cyan);transform:translateY(-2px);}
+  .topo .tn{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--cyan);letter-spacing:0.08em;margin-bottom:0.55rem;}
+  .topo .th{font-weight:600;font-size:0.9rem;margin-bottom:0.5rem;}
+  .topo .td{color:var(--dim);font-size:0.8rem;line-height:1.55;margin-bottom:0.7rem;}
+  .topo .tm{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--dim2);border-top:1px solid var(--border);padding-top:0.6rem;line-height:1.5;}
+  .topo .tm b{color:var(--green);font-weight:500;}
+
+  /* ---- conformance ladder ---- */
+  .ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;}
+  .rung{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1.2rem;position:relative;}
+  .rung.l0{border-left:3px solid var(--cyan);}
+  .rung.l1{border-left:3px solid var(--amber);}
+  .rung.l2{border-left:3px solid var(--green);}
+  .rung .rl{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;margin-bottom:0.5rem;}
+  .rung.l0 .rl{color:var(--cyan);} .rung.l1 .rl{color:var(--amber);} .rung.l2 .rl{color:var(--green);}
+  .rung .rh{font-weight:600;font-size:0.92rem;margin-bottom:0.6rem;}
+  .rung ul{margin:0;padding-left:1.05rem;color:var(--dim);font-size:0.8rem;line-height:1.7;}
+  .rung ul li{margin-bottom:0.15rem;}
+
+  /* ---- build roadmap ---- */
+  .road{display:flex;flex-direction:column;gap:0.5rem;}
+  .step{display:grid;grid-template-columns:44px 1fr auto;gap:1rem;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:0.85rem 1.1rem;transition:border-color .15s;}
+  .step:hover{border-color:var(--cyan);}
+  .step .si{font-family:'IBM Plex Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--cyan);text-align:center;}
+  .step .sc .st{font-weight:600;font-size:0.9rem;}
+  .step .sc .sd{color:var(--dim);font-size:0.8rem;line-height:1.5;margin-top:0.2rem;}
+  .step .sp{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--dim2);text-align:right;white-space:nowrap;}
+  .step .sp .prio{display:inline-block;padding:0.18rem 0.45rem;border-radius:4px;border:1px solid var(--border);}
+  .step.crit .sp .prio{color:var(--amber);border-color:rgba(242,184,75,0.4);}
+
+  footer{margin-top:3.4rem;padding-top:1.4rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+    font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--dim2);letter-spacing:0.03em;}
+
+  @media (max-width:900px){
+    .thesis{grid-template-columns:1fr;}
+    .tiles.c6,.tiles.c5,.tiles.c4{grid-template-columns:repeat(3,1fr);}
+    .topo-grid{grid-template-columns:repeat(2,1fr);}
+    .ladder{grid-template-columns:1fr;}
+  }
+  @media (max-width:560px){
+    .tiles.c6,.tiles.c5,.tiles.c4,.tiles.c3{grid-template-columns:repeat(2,1fr);}
+    .topo-grid{grid-template-columns:1fr;}
+    .plane-head .role{display:none;}
+    .step{grid-template-columns:32px 1fr;}
+    .step .sp{grid-column:2;text-align:left;}
+  }
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">PQC-Agile Cryptography · Reference Architecture <span class="rev">DRAFT · REV 01</span> <span class="rev">FOR WG REVIEW</span></p>
+    <h1>Common Crypto API <span class="wn">// working name — CAAP / PACE TBD</span></h1>
+    <p class="lede">A vendor-neutral abstraction that lets anything touching cryptography — applications, workloads, endpoints, hardware roots of trust — invoke operations by intent while algorithm choice is resolved by policy. Plug-and-play rests on two stable contracts and a compatibility path for the crypto that already exists.</p>
+    <div class="meta-row">
+      <div><b>STANDARDS LINEAGE</b>NIST CSWP 39 · FIPS 203/204/205 · IANA COSE</div>
+      <div><b>ABSTRACTS</b>algorithm identity — not hardware (cf. PKCS#11)</div>
+      <div><b>TARGET FORUM</b>OWASP · Linux Foundation · IETF</div>
+      <div><b>STATUS</b>architecture input · pre-standardization</div>
+    </div>
+  </header>
+
+  <!-- ===================== THESIS ===================== -->
+  <section>
+    <div class="sec-head"><span class="sec-num">00</span><h2>The Plug-and-Play Thesis</h2><span class="h2sub">two contracts, one broker</span></div>
+    <div class="thesis">
+      <div class="contract north">
+        <div class="lbl">↑ North Contract</div>
+        <div class="nm">Consumer API</div>
+        <div class="ds">Stable, algorithm-agnostic operations. Any consumer that speaks this — or the PKCS#11 shim — plugs in without knowing what runs underneath.</div>
+        <div class="ops">GenerateKeyPair · Sign · Verify<br>Encapsulate · Decapsulate · Derive<br>Wrap · GetCapabilities · ResolvePolicy</div>
+      </div>
+      <div class="thesis-core">
+        <div class="updown">CONSUMERS ↓</div>
+        <div class="box"><div class="t">Broker Core</div><div class="s">route · orchestrate · resolve</div></div>
+        <div class="updown">↑ PROVIDERS</div>
+      </div>
+      <div class="contract south">
+        <div class="lbl">↓ South Contract</div>
+        <div class="nm">Provider SPI</div>
+        <div class="ds">The contract backends implement. Any library, HSM, KMS, TPM or enclave that satisfies the SPI registers as a provider — no core changes.</div>
+        <div class="ops">describe_capabilities · keygen<br>sign · verify · encaps · decaps<br>derive · wrap · attest</div>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="k">WHY IT WORKS</span>
+      <div class="v">Consumers depend only on the <b>north contract</b>; backends satisfy only the <b>south contract</b>. Neither knows the other exists. New algorithms, new hardware, and policy changes all flow through the broker without touching consumer code — that is the entire agility payoff, expressed as an architecture rather than a promise.</div>
+    </div>
+  </section>
+
+  <!-- ===================== FULL STACK ===================== -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Everything That Touches Crypto</h2><span class="h2sub">consumer plane → broker → provider plane</span></div>
+
+    <!-- CONSUMER PLANE -->
+    <div class="plane">
+      <div class="plane-head"><span class="tag tag-consumer">CONSUMER PLANE</span><span class="ttl">Producers of cryptographic intent</span><span class="role">integrate via SDK · sidecar · PKCS#11 shim</span></div>
+      <div class="tiles c6">
+        <div class="tile"><div class="n">TLS / mTLS Servers</div><div class="m">gateways · proxies · brokers</div></div>
+        <div class="tile"><div class="n">K8s Workloads</div><div class="m">service mesh · sidecars</div></div>
+        <div class="tile"><div class="n">SPIFFE / WIMSE</div><div class="m">workload identity</div></div>
+        <div class="tile"><div class="n">PKI / CA Services</div><div class="m">issuance · CMP · EST · ACME</div></div>
+        <div class="tile"><div class="n">SSH CA</div><div class="m">host · user certs</div></div>
+        <div class="tile"><div class="n">Code / Artifact Signing</div><div class="m">CI/CD · SBOM · provenance</div></div>
+        <div class="tile"><div class="n">Databases / Storage</div><div class="m">TDE · field encryption</div></div>
+        <div class="tile"><div class="n">Messaging / JOSE-COSE</div><div class="m">tokens · payload signing</div></div>
+        <div class="tile"><div class="n">IoT / Medical Devices</div><div class="m">attestation · onboarding</div></div>
+        <div class="tile"><div class="n">OT / ICS / Automotive</div><div class="m">long-lived identities</div></div>
+        <div class="tile hw"><div class="n">Secure / Measured Boot</div><div class="m">build-time fixed (limited)</div></div>
+        <div class="tile hw"><div class="n">Firmware Signing</div><div class="m">supply chain root</div></div>
+      </div>
+    </div>
+
+    <div class="flow-sep"><span class="line"></span><span class="txt">CONSUMER API — SDK (Go/Rust/Java/C/Py) · gRPC · sidecar agent · PKCS#11 shim</span><span class="arrow">↓</span></div>
+
+    <!-- INTERFACE LAYER -->
+    <div class="plane">
+      <div class="plane-head"><span class="tag tag-interface">INTERFACE LAYER</span><span class="ttl">North contract + bindings</span><span class="role">stable · versioned · additive-only</span></div>
+      <div class="tiles c4">
+        <div class="tile"><div class="n">Native SDK Bindings</div><div class="m">in-process, low latency</div></div>
+        <div class="tile"><div class="n">RPC / gRPC Service</div><div class="m">central crypto service</div></div>
+        <div class="tile"><div class="n">Sidecar / Agent</div><div class="m">per-pod, per-host</div></div>
+        <div class="tile highlight"><div class="n">PKCS#11 Compat Shim</div><div class="m">legacy apps, zero code change</div></div>
+      </div>
+      <div class="core-note">Capability negotiation happens here: a consumer asks GetCapabilities() before committing to an operation, the same way TLS negotiates a cipher suite — so callers never assume support that a provider lacks.</div>
+    </div>
+
+    <div class="flow-sep"><span class="line"></span><span class="txt">operation dispatch</span><span class="arrow">↓</span></div>
+
+    <!-- CORE / BROKER -->
+    <div class="plane">
+      <div class="plane-head"><span class="tag tag-core">BROKER CORE</span><span class="ttl">Route · orchestrate · resolve · account</span><span class="role">the only stateful hot-path component</span></div>
+      <div class="tiles c5">
+        <div class="tile"><div class="n">Operation Router</div><div class="m">op → provider dispatch</div></div>
+        <div class="tile highlight"><div class="n">Composite Orchestrator</div><div class="m">hybrid fan-out + combiner</div></div>
+        <div class="tile"><div class="n">Policy Resolver Client</div><div class="m">intent → algorithm ID</div></div>
+        <div class="tile"><div class="n">Handle Manager</div><div class="m">opaque key references</div></div>
+        <div class="tile"><div class="n">Audit / Telemetry</div><div class="m">what resolved, per op</div></div>
+      </div>
+      <div class="core-note">The Composite Orchestrator is the real departure from PKCS#11: one hybrid identifier fans out to N primitives across possibly different providers, applies the registered combiner, and returns a single result — hybrid is first-class, never a special case bolted onto the call site.</div>
+    </div>
+
+    <div class="flow-sep"><span class="line"></span><span class="txt">PROVIDER SPI — describe · keygen · sign · verify · encaps · decaps · attest</span><span class="arrow">↓</span></div>
+
+    <!-- PROVIDER PLANE -->
+    <div class="plane">
+      <div class="plane-head"><span class="tag tag-provider">PROVIDER PLANE</span><span class="ttl">South contract implementations — where operations execute</span><span class="role">software + hardware, hot-swappable</span></div>
+      <div class="tiles c6">
+        <div class="tile"><div class="n">OpenSSL 3.x Provider</div><div class="m">provider API bridge</div></div>
+        <div class="tile"><div class="n">liboqs</div><div class="m">ML-KEM · ML-DSA · SLH-DSA</div></div>
+        <div class="tile"><div class="n">BoringSSL / Rust</div><div class="m">app-embedded stacks</div></div>
+        <div class="tile"><div class="n">Software Fallback</div><div class="m">agility without HW wait</div></div>
+        <div class="tile hw"><div class="n">HSM (PKCS#11)</div><div class="m">nCipher · Luna · Utimaco</div></div>
+        <div class="tile hw"><div class="n">Cloud KMS</div><div class="m">AWS · Azure · GCP</div></div>
+        <div class="tile hw"><div class="n">TPM 2.0</div><div class="m">platform root of trust</div></div>
+        <div class="tile hw"><div class="n">Secure Enclave</div><div class="m">SGX · SEV · TrustZone</div></div>
+        <div class="tile hw"><div class="n">Smartcard / PIV</div><div class="m">operator credentials</div></div>
+        <div class="tile hw"><div class="n">Network HSM Pool</div><div class="m">shared, HA-backed</div></div>
+        <div class="tile"><div class="n">QKD / QRNG Bridge</div><div class="m">entropy · key material</div></div>
+        <div class="tile"><div class="n">Vendor Crypto Lib</div><div class="m">proprietary, SPI-wrapped</div></div>
+      </div>
+    </div>
+
+    <!-- CONTROL PLANE (side) -->
+    <div class="plane" style="margin-top:0.8rem;">
+      <div class="plane-head"><span class="tag tag-control">CONTROL PLANE</span><span class="ttl">Off the hot path where possible — governs what the broker resolves to</span><span class="role">single source of truth</span></div>
+      <div class="tiles c4">
+        <div class="tile"><div class="n">Policy / Agility Engine</div><div class="m">profiles · deprecation states</div></div>
+        <div class="tile"><div class="n">Algorithm ID Registry</div><div class="m">IANA-sourced + composite</div></div>
+        <div class="tile"><div class="n">Crypto Inventory</div><div class="m">discovery · system of record</div></div>
+        <div class="tile"><div class="n">Signed Profile Distribution</div><div class="m">provenance · downgrade defense</div></div>
+      </div>
+      <div class="control-note">Provenance matters here more than anywhere: the policy profile is a catastrophic single point of downgrade if unsigned. Profiles are signed at source, verified before use, and resolution rejects any result weaker than the caller's stated minimum — even when a weaker algorithm is technically available.</div>
+    </div>
+  </section>
+
+  <!-- ===================== DEPLOYMENT ===================== -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Deployment Topologies</h2><span class="h2sub">same contracts, different placement</span></div>
+    <div class="topo-grid">
+      <div class="topo">
+        <div class="tn">TOPOLOGY A</div>
+        <div class="th">In-Process Library</div>
+        <div class="td">Broker linked directly into the app. Lowest latency, no network hop.</div>
+        <div class="tm"><b>Fits:</b> HSM-adjacent, latency-critical, single-tenant services.</div>
+      </div>
+      <div class="topo">
+        <div class="tn">TOPOLOGY B</div>
+        <div class="th">Local Daemon / Sidecar</div>
+        <div class="td">Broker as a per-host or per-pod agent. Apps call over a local socket.</div>
+        <div class="tm"><b>Fits:</b> Kubernetes, service mesh, mixed-language estates.</div>
+      </div>
+      <div class="topo">
+        <div class="tn">TOPOLOGY C</div>
+        <div class="th">Central Crypto Service</div>
+        <div class="td">Broker as a networked, HA service. Centralized policy enforcement and audit.</div>
+        <div class="tm"><b>Fits:</b> enterprise-wide governance, shared HSM pools, CLM platforms.</div>
+      </div>
+      <div class="topo">
+        <div class="tn">TOPOLOGY D</div>
+        <div class="th">Hybrid / Tiered</div>
+        <div class="td">Local broker for hot ops, central service for policy and inventory sync.</div>
+        <div class="tm"><b>Fits:</b> the realistic production default at scale.</div>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="k">HARD BOUNDARY</span>
+      <div class="v"><b>Constrained devices, boot-time roots, and line-rate datapaths sit outside this diagram.</b> A 32KB microcontroller, a measured-boot root of trust, or a MACsec datapath cannot host a broker or call a policy service — the algorithm is fixed at build time. This is a datacenter and enterprise-workload architecture, not a universal one. Saying that plainly is a feature at the WG table, not a weakness.</div>
+    </div>
+  </section>
+
+  <!-- ===================== CONFORMANCE ===================== -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Conformance Ladder</h2><span class="h2sub">adopt incrementally, certify per level</span></div>
+    <div class="ladder">
+      <div class="rung l0">
+        <div class="rl">LEVEL 0 · MANDATORY</div>
+        <div class="rh">Core Operations</div>
+        <ul>
+          <li>Capabilities · KeyGen</li>
+          <li>Sign · Verify</li>
+          <li>Encapsulate · Decapsulate</li>
+          <li>ResolvePolicy (dry-run)</li>
+          <li>Structured errors, no silent fallback</li>
+        </ul>
+      </div>
+      <div class="rung l1">
+        <div class="rl">LEVEL 1 · OPTIONAL</div>
+        <div class="rh">Agility + Hybrid</div>
+        <ul>
+          <li>DeriveSecret · Wrap / Unwrap</li>
+          <li>≥1 composite identifier</li>
+          <li>Registered combiner encoding</li>
+          <li>Policy-driven resolution live</li>
+        </ul>
+      </div>
+      <div class="rung l2">
+        <div class="rl">LEVEL 2 · OPTIONAL</div>
+        <div class="rh">Assured Hardware</div>
+        <ul>
+          <li>Non-extractable key guarantees</li>
+          <li>FIPS-validated backend attestation</li>
+          <li>Provider attestation format</li>
+          <li>Signed policy provenance enforced</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BUILD ROADMAP ===================== -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>What to Build First</h2><span class="h2sub">the concrete on-ramp</span></div>
+    <div class="road">
+      <div class="step crit">
+        <div class="si">1</div>
+        <div class="sc"><div class="st">Define both contracts as a machine-readable IDL</div><div class="sd">North (Consumer API) + South (Provider SPI) in one versioned schema — protobuf, OpenAPI, or CDDL. This artifact, not the prose, is what stops vendors diverging.</div></div>
+        <div class="sp"><span class="prio">FOUNDATION</span></div>
+      </div>
+      <div class="step">
+        <div class="si">2</div>
+        <div class="sc"><div class="st">Reference broker + one consumer binding</div><div class="sd">Prove the spec is buildable as written. Ambiguities surface here before the field. Open source from day one.</div></div>
+        <div class="sp"><span class="prio">PROVES SPEC</span></div>
+      </div>
+      <div class="step">
+        <div class="si">3</div>
+        <div class="sc"><div class="st">Two providers: liboqs (software) + PKCS#11 (HSM)</div><div class="sd">One software, one hardware — enough to demonstrate hot-swap and that the south contract holds across radically different backends.</div></div>
+        <div class="sp"><span class="prio">PROVES SPI</span></div>
+      </div>
+      <div class="step crit">
+        <div class="si">4</div>
+        <div class="sc"><div class="st">PKCS#11 compatibility shim</div><div class="sd">The fastest path to "works with everything that touches crypto today." Existing PKCS#11 apps plug in with zero code change — your strongest live demo for skeptics.</div></div>
+        <div class="sp"><span class="prio">ADOPTION UNLOCK</span></div>
+      </div>
+      <div class="step">
+        <div class="si">5</div>
+        <div class="sc"><div class="st">Composite path + one hybrid identifier end-to-end</div><div class="sd">ECDSA + ML-DSA through the orchestrator, resolved by a signed policy profile. Swap the profile, get a different cert, zero code change — the whole thesis in one demo.</div></div>
+        <div class="sp"><span class="prio">PROVES AGILITY</span></div>
+      </div>
+      <div class="step">
+        <div class="si">6</div>
+        <div class="sc"><div class="st">Test vectors + conformance suite</div><div class="sd">Runnable self-certification per level. This is what turns a design doc into something a working group can adopt and vendors can claim against.</div></div>
+        <div class="sp"><span class="prio">STANDARDS-READY</span></div>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="k">SEQUENCING</span>
+      <div class="v">Steps 1, 4 are the ones nobody else has done and the ones that carry the argument. Build the <b>IDL first</b> and the <b>PKCS#11 shim early</b> — together they answer the two questions every expert will ask: "how do you stop vendor drift" and "how does this work with what I already run."</div>
+    </div>
+  </section>
+
+  <footer>
+    <span>COMMON CRYPTO API · REFERENCE ARCHITECTURE · DRAFT REV 01</span>
+    <span>ANCHORED IN NIST CSWP 39 · NOT YET A STANDARDS-TRACK SUBMISSION</span>
+  </footer>
+</div>
+</body>
+</html>
