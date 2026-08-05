@@ -1,0 +1,16 @@
+{
+  "title": "A Common Crypto API: CAAP Research Framework v1",
+  "description": "A vendor-neutral research framework for a cryptographic abstraction layer with stable consumer, policy-decision, broker, and provider contracts.",
+  "canonicalPath": "/research/crypto-agility-algorithm-protocol/",
+  "status": "research-preview",
+  "socialImage": "images/caap-abstraction-layer.svg",
+  "keywords": [
+    "Common Crypto API",
+    "Crypto Agility Algorithm Protocol",
+    "cryptographic abstraction layer",
+    "cryptographic API",
+    "cryptographic broker",
+    "KMIP",
+    "PKCS#11"
+  ]
+}

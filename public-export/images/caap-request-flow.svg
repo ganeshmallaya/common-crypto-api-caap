@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">CAAP request and execution flow</title>
+  <desc id="desc">A ten-step flow from consumer authentication through policy decision, provider capability matching, exact dispatch, typed result, and evidence.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#4c5866"/></marker>
+    <filter id="rough" x="-3%" y="-4%" width="106%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="12" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.7"/></filter>
+    <style>
+      text{font-family:"Trebuchet MS","Segoe UI",sans-serif}.hand{font-family:"Comic Sans MS","Bradley Hand",cursive}
+      .ink{fill:#20262e}.muted{fill:#687381}.blue{fill:#176b87}.green{fill:#2b7a55}.red{fill:#a33a32}
+      .lane{stroke:#c7cbd0;stroke-width:2;stroke-dasharray:7 7}.flow{fill:none;stroke:#4c5866;stroke-width:2.6;marker-end:url(#arrow)}
+      .note{fill:#fffdf7;stroke:#596574;stroke-width:2.4;rx:10}.reject{fill:#fff2ee;stroke:#a33a32;stroke-width:2.4;rx:10}
+    </style>
+  </defs>
+  <rect width="1200" height="675" fill="#fbfaf5"/>
+  <g filter="url(#rough)">
+    <text x="52" y="57" class="ink hand" font-size="34">One request, one pinned decision, one exact dispatch</text>
+    <path d="M53 70 Q360 78 778 69" stroke="#176b87" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+    <text x="145" y="122" text-anchor="middle" class="blue" font-size="21">Consumer</text>
+    <text x="455" y="122" text-anchor="middle" class="ink" font-size="21">Broker</text>
+    <text x="770" y="122" text-anchor="middle" class="red" font-size="21">Policy authority</text>
+    <text x="1060" y="122" text-anchor="middle" class="green" font-size="21">Provider</text>
+    <path d="M145 139 L145 610" class="lane"/><path d="M455 139 L455 610" class="lane"/><path d="M770 139 L770 610" class="lane"/><path d="M1060 139 L1060 610" class="lane"/>
+
+    <path d="M145 178 L455 178" class="flow"/><text x="300" y="166" text-anchor="middle" class="ink" font-size="15">1  operation + intent + typed input + constraints</text>
+    <rect x="355" y="199" width="200" height="56" class="note"/><text x="455" y="222" text-anchor="middle" class="ink" font-size="15">2  authenticate, validate</text><text x="455" y="242" text-anchor="middle" class="muted" font-size="14">authorize before disclosure</text>
+    <path d="M455 282 L770 282" class="flow"/><text x="612" y="270" text-anchor="middle" class="ink" font-size="15">3  decision request</text>
+    <rect x="670" y="303" width="200" height="56" class="note"/><text x="770" y="326" text-anchor="middle" class="ink" font-size="15">4  evaluate pinned policy</text><text x="770" y="346" text-anchor="middle" class="muted" font-size="14">one decision or rejection</text>
+    <path d="M770 386 L455 386" class="flow"/><text x="612" y="374" text-anchor="middle" class="ink" font-size="15">5  signed decision + reason</text>
+    <path d="M455 424 L1060 424" class="flow"/><text x="758" y="412" text-anchor="middle" class="ink" font-size="15">6  scoped capability and key-state check</text>
+    <rect x="355" y="447" width="200" height="70" class="note"/><text x="455" y="471" text-anchor="middle" class="ink" font-size="15">7  match without fallback</text><text x="455" y="492" text-anchor="middle" class="muted" font-size="14">pin provider + decision</text><text x="455" y="511" text-anchor="middle" class="muted" font-size="14">validate key reference</text>
+    <path d="M455 544 L1060 544" class="flow"/><text x="758" y="532" text-anchor="middle" class="ink" font-size="15">8  exact concrete operation</text>
+    <path d="M1060 579 L455 579" class="flow"/><text x="758" y="568" text-anchor="middle" class="ink" font-size="15">9  native result or failure</text>
+    <path d="M455 618 L145 618" class="flow"/><text x="300" y="606" text-anchor="middle" class="ink" font-size="15">10  typed result + decision evidence</text>
+
+    <rect x="865" y="212" width="282" height="76" class="reject"/>
+    <text x="1006" y="238" text-anchor="middle" class="red" font-size="16">Reject before execution</text>
+    <text x="1006" y="261" text-anchor="middle" class="ink" font-size="14">ambiguity · expiry · downgrade</text>
+    <text x="1006" y="280" text-anchor="middle" class="ink" font-size="14">constraint or capability mismatch</text>
+  </g>
+</svg>
