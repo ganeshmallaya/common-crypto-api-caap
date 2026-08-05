@@ -1,0 +1,79 @@
+<svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" font-family="Caveat, 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive">
+<defs>
+  <filter id="r1" x="-6%" y="-6%" width="112%" height="112%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3" seed="11" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="r2" x="-6%" y="-6%" width="112%" height="112%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</defs>
+
+<rect width="900" height="560" fill="#fbfbf7"/>
+
+<!-- title -->
+<g filter="url(#r2)">
+  <text x="42" y="52" font-size="32" fill="#22252b">The algorithm name is welded into every call site</text>
+  <path d="M43 64 Q250 70 596 62" stroke="#e0673a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <text x="42" y="90" font-size="19" fill="#6a6f78">one identity provider, one signing operation, many places to edit</text>
+</g>
+
+<!-- app boxes -->
+<g filter="url(#r1)" stroke="#22252b" stroke-width="2.6" fill="none" stroke-linecap="round">
+  <path d="M50 128 L296 124 L299 226 L52 229 Z"/>
+  <path d="M330 128 L576 124 L579 226 L332 229 Z"/>
+  <path d="M610 128 L856 124 L859 226 L612 229 Z"/>
+  <path d="M50 264 L296 260 L299 362 L52 365 Z"/>
+  <path d="M330 264 L576 260 L579 362 L332 365 Z"/>
+  <path d="M610 264 L856 260 L859 362 L612 365 Z"/>
+</g>
+
+<g filter="url(#r2)">
+  <text x="68" y="156" font-size="20" fill="#22252b">Token service</text>
+  <text x="68" y="185" font-size="17" fill="#c0392b">alg = "ES256"</text>
+  <text x="68" y="210" font-size="15" fill="#6a6f78">14 call sites</text>
+
+  <text x="348" y="156" font-size="20" fill="#22252b">Session refresh</text>
+  <text x="348" y="185" font-size="17" fill="#c0392b">alg = "ES256"</text>
+  <text x="348" y="210" font-size="15" fill="#6a6f78">6 call sites</text>
+
+  <text x="628" y="156" font-size="20" fill="#22252b">Admin console</text>
+  <text x="628" y="185" font-size="17" fill="#c0392b">alg = "RS256"</text>
+  <text x="628" y="210" font-size="15" fill="#6a6f78">9 call sites</text>
+
+  <text x="68" y="292" font-size="20" fill="#22252b">Partner federation</text>
+  <text x="68" y="321" font-size="17" fill="#c0392b">alg = "RS256"</text>
+  <text x="68" y="346" font-size="15" fill="#6a6f78">22 call sites</text>
+
+  <text x="348" y="292" font-size="20" fill="#22252b">Device onboarding</text>
+  <text x="348" y="321" font-size="17" fill="#c0392b">alg = "ES256"</text>
+  <text x="348" y="346" font-size="15" fill="#6a6f78">11 call sites</text>
+
+  <text x="628" y="292" font-size="20" fill="#22252b">Audit exporter</text>
+  <text x="628" y="321" font-size="17" fill="#c0392b">alg = "ES256"</text>
+  <text x="628" y="346" font-size="15" fill="#6a6f78">4 call sites</text>
+</g>
+
+<!-- circled total -->
+<g filter="url(#r1)" stroke="#c0392b" stroke-width="3" fill="none">
+  <ellipse cx="452" cy="424" rx="188" ry="38"/>
+  <ellipse cx="452" cy="424" rx="193" ry="43" opacity="0.45"/>
+</g>
+<g filter="url(#r2)">
+  <text x="452" y="418" font-size="25" fill="#c0392b" text-anchor="middle">66 edits to change one algorithm</text>
+  <text x="452" y="446" font-size="17" fill="#c0392b" text-anchor="middle">6 deploys, 6 test cycles, 6 rollback plans</text>
+</g>
+
+<!-- arrows down to total -->
+<g filter="url(#r1)" stroke="#8a8f98" stroke-width="2" fill="none" stroke-linecap="round">
+  <path d="M175 366 L300 385"/><path d="M455 366 L452 384"/><path d="M735 366 L604 385"/>
+</g>
+
+<!-- bottom note -->
+<g filter="url(#r2)">
+  <path d="M52 494 L850 490" stroke="#c9cdd4" stroke-width="2" fill="none"/>
+  <text x="52" y="522" font-size="19" fill="#3d4148">The migration cost does not scale with the algorithm. It scales with the</text>
+  <text x="52" y="546" font-size="19" fill="#3d4148">number of places a developer typed the algorithm name.</text>
+</g>
+</svg>
