@@ -3,7 +3,8 @@
 This directory is the only CAAP content boundary intended for a public website.
 The source repository remains authoritative.
 
-Current status: **draft; not eligible for synchronization**.
+Current status: **reviewed; eligible for commit-pinned synchronization after
+explicit approval of the website-repository change**.
 
 The Framework v1 candidate export consists of:
 
@@ -12,8 +13,8 @@ The Framework v1 candidate export consists of:
 - `website-metadata.json`, portable title, description, route, status, and
   social-image metadata for the website integration.
 
-Candidate files remain ineligible for website synchronization until the
-manifest allowlists their exact paths and hashes at a reviewed source commit.
+The manifest allowlists the exact paths and hashes at the reviewed source
+commit. A website repository must copy only those files and record that source.
 
 Publication requirements are defined in
 [`../docs/publication-workflow.md`](../docs/publication-workflow.md) and enforced
