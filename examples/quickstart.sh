@@ -21,9 +21,9 @@ create_body="$(sed 's/example-create-0001/example-create-'"$$"'/' "$(dirname "$0
 create_response="$(post_json /v2/keys "$create_body")"
 key_ref="$(printf '%s' "$create_response" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["keyRef"])')"
 message="cmVsZWFzZSBhcnRpZmFjdA"
-sign_body="{\"apiVersion\":\"2.0.0-draft\",\"requestId\":\"example-sign-$$\",\"operation\":\"Sign\",\"intent\":\"artifact-signing\",\"expectedPolicy\":{\"profileId\":\"baseline-artifact-signing\",\"profileVersion\":\"1\"},\"minimumConstraints\":{\"profile\":\"artifact-signing-v0\",\"providerClasses\":[\"software\"]},\"input\":{\"keyRef\":\"$key_ref\",\"message\":\"$message\"}}"
+sign_body="{\"apiVersion\":\"2.0.0\",\"requestId\":\"example-sign-$$\",\"operation\":\"Sign\",\"intent\":\"artifact-signing\",\"expectedPolicy\":{\"profileId\":\"baseline-artifact-signing\",\"profileVersion\":\"1\"},\"minimumConstraints\":{\"profile\":\"artifact-signing-v0\",\"providerClasses\":[\"software\"]},\"input\":{\"keyRef\":\"$key_ref\",\"message\":\"$message\"}}"
 sign_response="$(post_json /v2/sign "$sign_body")"
 signature="$(printf '%s' "$sign_response" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["signature"])')"
-verify_body="{\"apiVersion\":\"2.0.0-draft\",\"requestId\":\"example-verify-$$\",\"operation\":\"Verify\",\"intent\":\"artifact-signing\",\"expectedPolicy\":{\"profileId\":\"baseline-artifact-signing\",\"profileVersion\":\"1\"},\"minimumConstraints\":{\"profile\":\"artifact-signing-v0\",\"providerClasses\":[\"software\"]},\"input\":{\"keyRef\":\"$key_ref\",\"message\":\"$message\",\"signature\":\"$signature\"}}"
+verify_body="{\"apiVersion\":\"2.0.0\",\"requestId\":\"example-verify-$$\",\"operation\":\"Verify\",\"intent\":\"artifact-signing\",\"expectedPolicy\":{\"profileId\":\"baseline-artifact-signing\",\"profileVersion\":\"1\"},\"minimumConstraints\":{\"profile\":\"artifact-signing-v0\",\"providerClasses\":[\"software\"]},\"input\":{\"keyRef\":\"$key_ref\",\"message\":\"$message\",\"signature\":\"$signature\"}}"
 post_json /v2/verify "$verify_body"
 printf '\n'

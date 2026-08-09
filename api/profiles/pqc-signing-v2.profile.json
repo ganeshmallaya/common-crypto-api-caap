@@ -1,9 +1,9 @@
 {
   "$schema": "../../schemas/algorithm-profile.schema.json",
-  "schemaVersion": "2.0.0-draft",
+  "schemaVersion": "2.0.0",
   "profileId": "pqc-signing-v2",
   "profileVersion": "2",
-  "status": "candidate",
+  "status": "experimental",
   "family": "signature",
   "operations": ["CreateKey", "Sign", "Verify", "TransformKey"],
   "input": {
@@ -38,7 +38,7 @@
   "securityNotes": [
     "TransformKey creates new ML-DSA key material; it does not convert an ECC private key.",
     "An overlap profile may permit ECDSA verification while requiring ML-DSA signing.",
-    "The current minimal software provider does not execute these candidate algorithms.",
+    "The current minimal software provider does not execute these algorithms.",
     "Silent fallback between classical and post-quantum algorithms is forbidden."
   ],
   "references": [

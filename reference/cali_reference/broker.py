@@ -15,8 +15,10 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+from .policy import PolicyLoadError, resolve_certificate_policy
 
-API_VERSION = "2.0.0-draft"
+
+API_VERSION = "2.0.0"
 PROFILE = "artifact-signing-v0"
 ALGORITHM = "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519"
 POLICY = {"profileId": "baseline-artifact-signing", "profileVersion": "1"}
@@ -29,6 +31,7 @@ RECOGNIZED_EXECUTION_OPERATIONS = {
     "DeriveKey", "DeriveBytes", "AgreeKey", "Encapsulate", "Decapsulate",
     "WrapKey", "UnwrapKey", "BeginOperation", "UpdateOperation",
     "FinalizeOperation", "AbortOperation",
+    "SelectCertificate",
 }
 
 
@@ -85,9 +88,15 @@ def _b64decode(value: Any, field: str) -> bytes:
 class Broker:
     """In-memory research broker. A new process starts with no keys."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        certificate_policy: dict[str, Any] | None = None,
+        certificate_profiles: set[str] | None = None,
+    ) -> None:
         self._keys: dict[str, KeyRecord] = {}
         self.audit_events: list[dict[str, Any]] = []
+        self.certificate_policy = certificate_policy
+        self.certificate_profiles = certificate_profiles or {"ecdsa-p256-sha256"}
 
     def capabilities(self, tenant: str) -> dict[str, Any]:
         generated_at = datetime.now(UTC)
@@ -112,6 +121,8 @@ class Broker:
                 return 200, self._sign(request, tenant)
             if operation == "Verify":
                 return 200, self._verify(request, tenant)
+            if operation == "SelectCertificate":
+                return 200, self._select_certificate(request, tenant)
             raise CaliError("NOT_IMPLEMENTED", f"operation {operation!r} is recognized but not implemented", status=501)
         except CaliError as exc:
             self._record_failure(request, tenant, exc)
@@ -137,7 +148,7 @@ class Broker:
         request_id = request["requestId"]
         if not isinstance(request_id, str) or not 8 <= len(request_id) <= 128 or not all(c.isalnum() or c in "._:-" for c in request_id):
             raise CaliError("INVALID_REQUEST", "invalid requestId")
-        if request["intent"] != "artifact-signing":
+        if request["intent"] not in {"artifact-signing", "apache-tls"}:
             raise CaliError("POLICY_NOT_FOUND", "no policy for requested intent")
         if not isinstance(request["operation"], str) or request["operation"] not in RECOGNIZED_EXECUTION_OPERATIONS:
             raise CaliError("INVALID_REQUEST", "unknown operation")
@@ -145,6 +156,8 @@ class Broker:
             raise CaliError("INVALID_REQUEST", "minimumConstraints and input must be objects")
 
     def _decision(self, request: dict[str, Any]) -> dict[str, Any]:
+        if request["intent"] != "artifact-signing":
+            raise CaliError("POLICY_NOT_FOUND", "artifact signing policy does not match this intent")
         expected = request.get("expectedPolicy")
         if expected is not None and expected != POLICY:
             raise CaliError("POLICY_INACTIVE", "expected policy is not the active pinned policy")
@@ -158,6 +171,49 @@ class Broker:
         if unknown:
             raise CaliError("INVALID_REQUEST", f"unknown minimum constraints: {', '.join(sorted(unknown))}")
         return {"policy": POLICY, "profile": PROFILE, "algorithm": ALGORITHM, "providerRef": PROVIDER_REF}
+
+    def _select_certificate(self, request: dict[str, Any], tenant: str) -> dict[str, Any]:
+        if self.certificate_policy is None:
+            raise CaliError("POLICY_NOT_FOUND", "no certificate policy is configured")
+        input_data = request["input"]
+        if set(input_data) != {"hostname"} or not isinstance(input_data["hostname"], str):
+            raise CaliError("INVALID_REQUEST", "SelectCertificate requires only input.hostname")
+        constraints = request["minimumConstraints"]
+        if set(constraints) - {"profile"}:
+            raise CaliError("INVALID_REQUEST", "SelectCertificate accepts only the profile constraint")
+        if constraints.get("profile") != "apache-pqc-migration":
+            raise CaliError("CONSTRAINT_MISMATCH", "apache-pqc-migration profile is required")
+        expected = request.get("expectedPolicy")
+        active = {
+            "profileId": self.certificate_policy["profileId"],
+            "profileVersion": self.certificate_policy["profileVersion"],
+        }
+        if expected is not None and expected != active:
+            raise CaliError("POLICY_INACTIVE", "expected certificate policy is not active")
+        try:
+            policy, choice = resolve_certificate_policy(
+                self.certificate_policy,
+                input_data["hostname"],
+                self.certificate_profiles,
+            )
+        except PolicyLoadError as exc:
+            category = "POLICY_AMBIGUOUS" if "more than one" in str(exc) else "CAPABILITY_MISMATCH"
+            if "no active" in str(exc):
+                category = "POLICY_NOT_FOUND"
+            raise CaliError(category, str(exc)) from exc
+        decision = {
+            "policy": policy,
+            "profile": choice["profile"],
+            "algorithm": choice["algorithm"],
+            "providerRef": "apache:local-demo",
+        }
+        result = {
+            "hostname": input_data["hostname"],
+            "certificateRef": choice["certificateRef"],
+            "profile": choice["profile"],
+            "reloadRequired": True,
+        }
+        return self._response(request, tenant, decision, result)
 
     def _resolve(self, request: dict[str, Any], tenant: str) -> dict[str, Any]:
         if request["input"]:
@@ -187,7 +243,7 @@ class Broker:
         decision = self._decision(request)
         input_data = request["input"]
         if set(input_data) != {"keyRef", "message", "signature"}:
-            raise CaliError("INVALID_REQUEST", "Verify input requires only keyRef, message, and signature")
+            raise CaliError("INVALID_REQUEST", "Verify input requires only keyRef, message and signature")
         key = self._get_key(input_data["keyRef"], tenant)
         message = _b64decode(input_data["message"], "input.message")
         signature = _b64decode(input_data["signature"], "input.signature")

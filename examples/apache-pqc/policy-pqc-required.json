@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "2.0.0",
+  "profileId": "apache-pqc-migration",
+  "profileVersion": "pqc-required-1",
+  "status": "active",
+  "effectiveAt": "2026-08-01T00:00:00Z",
+  "expiresAt": null,
+  "rules": [
+    {
+      "ruleId": "www-example-pqc-required",
+      "intent": "apache-tls",
+      "operation": "SelectCertificate",
+      "hostnames": ["localhost"],
+      "choices": [
+        {
+          "profile": "mldsa-65",
+          "algorithm": "urn:oid:2.16.840.1.101.3.4.3.18",
+          "certificateRef": "certificate:apache:localhost:mldsa65"
+        }
+      ]
+    }
+  ]
+}

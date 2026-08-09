@@ -2,19 +2,19 @@
 
 CALI is proprietary, vendor-neutral research by **Ganesh Mallaya** for a
 policy-controlled cryptographic abstraction layer. The **Common Crypto API** is
-the consumer interface defined by CALI; `common-crypto-api-caap` is this
+the consumer interface defined by CALI; `cali-crypto-interface` is this
 repository.
 
 Research site: <https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/>
 
 The project asks a bounded question: can an application request a cryptographic
 outcome without hard-coding an algorithm or provider, while the system preserves
-authorization, pinned policy, explicit failures, key custody, and usable audit
+authorization, pinned policy, explicit failures, key custody and usable audit
 evidence?
 
-> **Research status:** candidate v2.0 and not production-ready. This is not a standard,
-> certification, security assurance, or interoperability claim. The schemas and
-> HTTP binding are candidate contracts until the conformance milestones in the
+> **Research status:** exploratory v2.0 and not production ready. This is not a standard,
+> certification, security assurance or interoperability claim. The schemas and
+> HTTP binding are research contracts until the conformance milestones in the
 > roadmap are met.
 
 ## Start here
@@ -27,6 +27,7 @@ evidence?
 | Inspect the v2 classical-to-PQC profile | [`api/profiles/pqc-signing-v2.profile.json`](api/profiles/pqc-signing-v2.profile.json) |
 | Use the HTTP contract | [`api/openapi/cali-v2.openapi.json`](api/openapi/cali-v2.openapi.json) |
 | Run the reference service | [`reference/README.md`](reference/README.md) |
+| Run the Apache migration example | [`examples/apache-pqc/README.md`](examples/apache-pqc/README.md) |
 | See supported versus planned operations | [`ROADMAP.md`](ROADMAP.md) |
 | Review alignment to NIST crypto-agility guidance | [`docs/nist-cswp-39-alignment.md`](docs/nist-cswp-39-alignment.md) |
 | Understand threats and non-goals | [`docs/security-considerations.md`](docs/security-considerations.md) |
@@ -66,7 +67,14 @@ implements one deliberately small Ed25519 vertical slice:
 
 Everything else is maturity-labelled in [`ROADMAP.md`](ROADMAP.md). Unsupported
 behavior must fail explicitly; it must never fall back to another algorithm,
-provider, policy, or key-protection level.
+provider, policy or key-protection level.
+
+The service also implements policy driven certificate selection for the Apache
+migration demonstration. Transition policy selects an approved ECDSA
+certificate when Apache declares only ECDSA capability. Strict ML DSA policy
+fails with `CAPABILITY_MISMATCH` and leaves the live Apache certificate fragment
+unchanged. This tests migration control and failure behavior. It does not claim
+an ML DSA TLS handshake.
 
 ## Quick start
 
@@ -85,6 +93,12 @@ curl http://127.0.0.1:8080/v2/capabilities
 
 The runnable end-to-end example is in [`examples/quickstart.sh`](examples/quickstart.sh).
 
+The live Apache policy example is:
+
+```sh
+examples/apache-pqc/run_demo.sh
+```
+
 ## Validation
 
 ```sh
@@ -94,8 +108,8 @@ python3 -m unittest discover -s tests -v
 ## Repository layout
 
 ```text
-api/          candidate HTTP/OpenAPI binding
-docs/         architecture, analysis, security, and governance
+api/          research HTTP and OpenAPI binding
+docs/         architecture, analysis, security and governance
 examples/     non-production requests and a runnable flow
 reference/    minimal broker and software provider
 schemas/      experimental JSON Schema contracts
@@ -118,6 +132,6 @@ Research feedback and private vulnerability reporting are described in
 [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md). Approve
 the first release status before public release. CALI is informed by
 [NIST CSWP 39upd1](https://doi.org/10.6028/NIST.CSWP.39-upd1), but is not a NIST
-publication, standard, implementation, endorsement, or conformance claim. CALI
+publication, standard, implementation, endorsement or conformance claim. CALI
 is developed independently and has no affiliation with, sponsorship by,
-compatibility claim to, or endorsement from any existing implementation.
+compatibility claim to or endorsement from any existing implementation.

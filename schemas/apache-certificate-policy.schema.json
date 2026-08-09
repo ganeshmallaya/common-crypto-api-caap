@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/ganeshmallaya/cali-crypto-interface/main/schemas/apache-certificate-policy.schema.json",
+  "title": "CALI Apache certificate migration policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profileId", "profileVersion", "status", "effectiveAt", "expiresAt", "rules"],
+  "properties": {
+    "schemaVersion": {"const": "2.0.0"},
+    "profileId": {"const": "apache-pqc-migration"},
+    "profileVersion": {"type": "string", "minLength": 1, "maxLength": 64},
+    "status": {"const": "active"},
+    "effectiveAt": {"type": "string", "format": "date-time"},
+    "expiresAt": {"type": ["string", "null"], "format": "date-time"},
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ruleId", "intent", "operation", "hostnames", "choices"],
+        "properties": {
+          "ruleId": {"type": "string", "minLength": 1},
+          "intent": {"const": "apache-tls"},
+          "operation": {"const": "SelectCertificate"},
+          "hostnames": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "format": "hostname"}},
+          "choices": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["profile", "algorithm", "certificateRef"],
+              "properties": {
+                "profile": {"enum": ["ecdsa-p256-sha256", "mldsa-65"]},
+                "algorithm": {"enum": ["urn:oid:1.2.840.10045.4.3.2", "urn:oid:2.16.840.1.101.3.4.3.18"]},
+                "certificateRef": {"type": "string", "pattern": "^certificate:[a-z0-9:-]+$"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

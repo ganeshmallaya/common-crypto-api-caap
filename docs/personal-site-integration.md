@@ -5,15 +5,15 @@ The canonical public route is:
 <https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/>
 
 The personal site renders CALI explanatory pages natively using its shared
-Astro header, footer, accessibility behavior, search, responsive layout, and
+Astro header, footer, accessibility behavior, search, responsive layout and
 left-side page navigation. It does not proxy GitHub Pages and does not fetch
 repository files at runtime.
 
 ## Authority boundary
 
-This repository remains authoritative for the candidate specification, schemas,
+This repository remains authoritative for the research specification, schemas,
 OpenAPI document, machine-readable registry and profiles, examples, reference
-service, tests, and roadmap. Each native research page ends with a direct link
+service, tests and roadmap. Each native research page ends with a direct link
 to the corresponding repository artifact.
 
 The personal-site copy explains those artifacts for engineers. When a protocol
@@ -25,6 +25,8 @@ page and both repositories' tests in the same reviewed release.
 | Public page | Repository source |
 | --- | --- |
 | `/research/crypto-agility-algorithm-protocol/` | `README.md` |
+| `/architecture/` | `docs/architecture.md` |
+| `/policy-broker/` | `examples/apache-pqc/README.md` |
 | `/specification/` | `spec/cali-v2.md` |
 | `/operations/` | `spec/operation-contracts.md` |
 | `/operation-catalog/` | `api/operation-registry.json` |
@@ -42,4 +44,4 @@ Every child path above is relative to the canonical research route.
 
 Keep changes local until the maintainer approves commit and deployment. Validate
 this repository with `python3 -m unittest discover -s tests -v` and validate the
-personal site with its formatting, lint, build, link, and Playwright gates.
+personal site with its formatting, lint, build, link and Playwright gates.

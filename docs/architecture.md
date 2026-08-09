@@ -24,7 +24,7 @@ Consumer or CA workflow
 The model has a northbound consumer contract and a southbound provider
 contract. The broker connects them but does not make an unconstrained “best
 available” choice. It applies an authenticated policy decision and rejects a
-request when the decision, capabilities, or caller constraints do not agree.
+request when the decision, capabilities or caller constraints do not agree.
 
 ## Component responsibilities
 
@@ -39,7 +39,7 @@ request when the decision, capabilities, or caller constraints do not agree.
 ### Broker
 
 - Authenticates and authorizes the caller.
-- Validates request shape, version, freshness, and replay controls.
+- Validates request shape, version, freshness and replay controls.
 - Pins the policy profile and version used for a decision.
 - Checks that provider capability and key metadata match the decision.
 - Routes the operation and returns a structured result or error.
@@ -48,19 +48,74 @@ request when the decision, capabilities, or caller constraints do not agree.
 The broker is a policy enforcement point, not the unconstrained policy decision
 maker or a source of cryptographic truth. It has bounded operational
 intelligence: it validates context, matches authenticated capabilities, routes
-operations, manages logical references, and records evidence. The policy
+operations, manages logical references and records evidence. The policy
 authority owns the risk decision. The broker does not make an algorithm secure
 merely by selecting it.
 
 ### Policy authority and resolver
 
 - Publishes versioned profiles with provenance and lifecycle state.
-- Evaluates intent, operation, caller context, and minimum constraints.
+- Evaluates intent, operation, caller context and minimum constraints.
 - Returns one unambiguous decision or a rejection.
 - Supports staged evaluation before activation.
 
 The mechanism for authenticating policy profiles is unresolved. Until it is
 specified, a deployment cannot claim downgrade-resistant policy distribution.
+
+## Reference policy integration
+
+The checked in service implements one concrete policy path for Apache
+certificate migration.
+
+1. The operator selects a policy file with `CALI_POLICY_FILE`.
+2. The process parses the policy before opening the HTTP listener.
+3. The process rejects invalid status, future activation, expiry and malformed
+   fields.
+4. The client sends `expectedPolicy` with profile ID and version.
+5. The broker finds one rule for `SelectCertificate` and the requested
+   hostname.
+6. The broker intersects policy choices with `CALI_CERTIFICATE_PROFILES`.
+7. One match returns a logical certificate reference and evidence. No match
+   returns `CAPABILITY_MISMATCH`.
+
+The reference path uses a local file. The proposed architecture permits a
+separate policy authority to distribute signed policy through a protected
+control channel. That work remains planned.
+
+```text
+operator or policy pipeline
+        |
+        | CALI_POLICY_FILE at process start
+        v
+policy loader ---- invalid, early or expired ----> process stops
+        |
+        | active profile + version + hostname rule
+        v
+broker request ---- expectedPolicy mismatch -----> POLICY_INACTIVE
+        |
+        | approved choices intersect live capability
+        +---- no match --------------------------> CAPABILITY_MISMATCH
+        |
+        v
+certificateRef + profile + evidence
+```
+
+## Reference network flow
+
+The Apache example uses two loopback listeners.
+
+| Step | Source | Destination | Traffic |
+| --- | --- | --- | --- |
+| 1 | Deployment helper | CALI broker on `127.0.0.1:18085` | `POST /v2/certificates:select` with policy pin and hostname |
+| 2 | Broker | Local policy loader | In process rule lookup against the loaded JSON document |
+| 3 | Broker | Deployment helper | Selected certificate reference or stable error plus evidence |
+| 4 | Deployment helper | Apache include file | Atomic write only after a successful decision |
+| 5 | TLS client | Apache on `127.0.0.1:18443` | HTTPS request to the test application |
+
+The helper never sends private key material to the broker. It maps the logical
+reference to files under its own deployment boundary. Strict ML DSA policy with
+only ECDSA capability fails. The helper does not rewrite the Apache include and
+Apache continues to use the last approved certificate.
 
 ### Provider adapter
 
@@ -74,8 +129,8 @@ Capability discovery is not authorization and does not guarantee that a later
 operation will succeed.
 
 A provider adapter may translate the southbound contract to PKCS#11, OASIS
-KMIP, a cloud KMS API, or a software-library API. That translation must preserve
-operation, parameter, object-state, authorization, key-custody, and error
+KMIP, a cloud KMS API or a software-library API. That translation must preserve
+operation, parameter, object-state, authorization, key-custody and error
 semantics. CALI does not replace the underlying provider protocol. See
 [`control-plane-and-kmip.md`](control-plane-and-kmip.md).
 
@@ -84,23 +139,23 @@ semantics. CALI does not replace the underlying provider protocol. See
 A CA or certificate management workflow is normally a consumer or orchestrator
 at the north boundary. It can ask CALI to generate or use a key and to perform a
 signature. CALI does not decide certificate subject policy, validate an
-enrollment request, issue a certificate, publish revocation state, or replace
-ACME, CMP, EST, or other CA protocols.
+enrollment request, issue a certificate, publish revocation state or replace
+ACME, CMP, EST or other CA protocols.
 
 ## Trust boundaries
 
 1. **Consumer to broker:** caller identity, request integrity, tenant isolation,
-   freshness, and authorization.
+   freshness and authorization.
 2. **Broker to policy authority:** policy provenance, version pinning, rollback
-   prevention, availability, and consistent time.
+   prevention, availability and consistent time.
 3. **Broker to provider:** mutual authentication where remote, capability
-   authenticity, operation authorization, key-reference scoping, and error
+   authenticity, operation authorization, key-reference scoping and error
    integrity.
 4. **Provider to backend:** backend credentials, key custody, mechanism
-   translation, session isolation, and lifecycle state.
+   translation, session isolation and lifecycle state.
 5. **Research repository to hosted research site:** reviewed native explanatory
    pages, direct authoritative-source links, branch protection, build
-   provenance, and explicit publication approval.
+   provenance and explicit publication approval.
 
 ## Deployment patterns
 
@@ -108,8 +163,8 @@ ACME, CMP, EST, or other CA protocols.
 | --- | --- | --- |
 | In-process library | Low call overhead | Application compromise may include the broker and software keys. |
 | Local daemon or sidecar | Language-neutral local contract | Local peer authentication and namespace isolation become critical. |
-| Central service | Central policy and audit | Network identity, availability, latency, and cross-tenant isolation become critical. |
-| Tiered deployment | Local operations with central governance | Policy consistency, cache expiry, and disconnected behavior must be defined. |
+| Central service | Central policy and audit | Network identity, availability, latency and cross-tenant isolation become critical. |
+| Tiered deployment | Local operations with central governance | Policy consistency, cache expiry and disconnected behavior must be defined. |
 
 No pattern is selected as the canonical deployment in this phase.
 
@@ -123,3 +178,10 @@ No pattern is selected as the canonical deployment in this phase.
   the broker cannot safely invent them.
 - Constrained or fixed-function environments may require build-time choices and
   may not support the broker model.
+
+## Executable evidence
+
+Run [`examples/apache-pqc/run_demo.sh`](../examples/apache-pqc/run_demo.sh).
+The script starts the reference broker and Apache, serves a local HTTPS page,
+activates strict ML DSA policy and verifies that capability failure leaves the
+active Apache fragment unchanged.

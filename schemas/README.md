@@ -1,7 +1,7 @@
 # Experimental schemas
 
-These JSON Schema 2020-12 documents support the `2.0.0-draft` research slice.
-The OpenAPI document is the candidate HTTP binding; the prose specification
+These JSON Schema 2020-12 documents support the `2.0.0` research slice.
+The OpenAPI document is the research HTTP binding. The prose specification
 controls when a schema cannot express a semantic requirement.
 
 The request schema uses operation-specific conditional validation rather than
@@ -13,5 +13,5 @@ examples and reference-service requests against these schemas.
 index. Both remain experimental knowledge-base inputs rather than policy.
 
 The schemas are not a normative wire format or a conformance claim. Promotion
-still requires canonical vectors, compatibility rules, and independent
+still requires canonical vectors, compatibility rules and independent
 implementation results.

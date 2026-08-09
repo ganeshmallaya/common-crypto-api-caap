@@ -1,11 +1,11 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "CALI Common Crypto API — reference HTTP binding",
-    "version": "2.0.0-draft",
-    "description": "Typed HTTP/JSON binding for the implemented artifact-signing research slice. Cross-family candidate semantics are defined in spec/operation-contracts.md. This document is not production guidance or a conformance claim.",
+    "title": "CALI Common Crypto API reference HTTP binding",
+    "version": "2.0.0",
+    "description": "Typed HTTP and JSON binding for the implemented research slice. Cross family semantics are defined in spec/operation-contracts.md. This document is not production guidance or a conformance claim.",
     "license": {
-      "name": "Proprietary — all rights reserved"
+      "name": "Proprietary. All rights reserved"
     }
   },
   "servers": [
@@ -71,6 +71,21 @@
           "200": {"description": "Pinned policy decision", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ResolvePolicyResponse"}}}},
           "4XX": {"$ref": "#/components/responses/ClientError"},
           "501": {"$ref": "#/components/responses/NotImplemented"}
+        }
+      }
+    },
+    "/v2/certificates:select": {
+      "post": {
+        "operationId": "selectCertificate",
+        "summary": "Select an Apache TLS certificate through active migration policy",
+        "tags": ["Policy"],
+        "x-cali-maturity": "implemented",
+        "x-cali-profile": "apache-pqc-migration",
+        "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
+        "requestBody": {"$ref": "#/components/requestBodies/SelectCertificateRequest"},
+        "responses": {
+          "200": {"description": "Pinned certificate selection and evidence", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SelectCertificateResponse"}}}},
+          "4XX": {"$ref": "#/components/responses/ClientError"}
         }
       }
     },
@@ -172,13 +187,14 @@
     },
     "requestBodies": {
       "ResolvePolicyRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ResolvePolicyRequest"}}}},
+      "SelectCertificateRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SelectCertificateRequest"}}}},
       "CreateKeyRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateKeyRequest"}}}},
       "SignRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SignRequest"}}}},
       "VerifyRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/VerifyRequest"}}}}
     },
     "responses": {
       "ClientError": {
-        "description": "Explicit CALI request, authorization, policy, capability, or key failure",
+        "description": "Explicit CALI request, authorization, policy, capability or key failure",
         "headers": {"Cache-Control": {"$ref": "#/components/headers/NoStore"}},
         "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}
       },
@@ -192,12 +208,12 @@
       }
     },
     "schemas": {
-      "ApiVersion": {"type": "string", "const": "2.0.0-draft"},
+      "ApiVersion": {"type": "string", "const": "2.0.0"},
       "RequestId": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{8,128}$"},
-      "Intent": {"type": "string", "const": "artifact-signing"},
-      "Profile": {"type": "string", "const": "artifact-signing-v0"},
-      "Algorithm": {"type": "string", "const": "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519"},
-      "ProviderRef": {"type": "string", "const": "software:python-cryptography"},
+      "Intent": {"type": "string", "enum": ["artifact-signing", "apache-tls"]},
+      "Profile": {"type": "string", "enum": ["artifact-signing-v0", "apache-pqc-migration", "ecdsa-p256-sha256", "mldsa-65"]},
+      "Algorithm": {"type": "string", "enum": ["http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519", "urn:oid:1.2.840.10045.4.3.2", "urn:oid:2.16.840.1.101.3.4.3.18"]},
+      "ProviderRef": {"type": "string", "enum": ["software:python-cryptography", "apache:local-demo"]},
       "KeyRef": {"type": "string", "pattern": "^key_[A-Za-z0-9_-]{16,128}$"},
       "CanonicalBase64": {"type": "string", "minLength": 2, "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}|[A-Za-z0-9+/]{3})?$", "description": "Canonical non-empty unpadded base64. Padding and impossible encoded lengths are rejected."},
       "PolicyReference": {
@@ -206,7 +222,8 @@
         "required": ["profileId", "profileVersion"],
         "properties": {
           "profileId": {"type": "string", "minLength": 1, "maxLength": 128},
-          "profileVersion": {"type": "string", "minLength": 1, "maxLength": 64}
+          "profileVersion": {"type": "string", "minLength": 1, "maxLength": 64},
+          "ruleId": {"type": "string", "minLength": 1, "maxLength": 128}
         }
       },
       "MinimumConstraints": {
@@ -224,7 +241,7 @@
         "properties": {
           "apiVersion": {"$ref": "#/components/schemas/ApiVersion"},
           "requestId": {"$ref": "#/components/schemas/RequestId"},
-          "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify"]},
+          "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify", "SelectCertificate"]},
           "intent": {"$ref": "#/components/schemas/Intent"},
           "expectedPolicy": {"$ref": "#/components/schemas/PolicyReference"},
           "minimumConstraints": {"$ref": "#/components/schemas/MinimumConstraints"},
@@ -235,6 +252,12 @@
         "allOf": [
           {"$ref": "#/components/schemas/CommonRequest"},
           {"type": "object", "properties": {"operation": {"const": "ResolvePolicy"}, "input": {"type": "object", "maxProperties": 0}}}
+        ]
+      },
+      "SelectCertificateRequest": {
+        "allOf": [
+          {"$ref": "#/components/schemas/CommonRequest"},
+          {"type": "object", "properties": {"operation": {"const": "SelectCertificate"}, "intent": {"const": "apache-tls"}, "input": {"type": "object", "additionalProperties": false, "required": ["hostname"], "properties": {"hostname": {"type": "string", "format": "hostname"}}}}}
         ]
       },
       "CreateKeyRequest": {
@@ -301,7 +324,7 @@
         "properties": {
           "apiVersion": {"$ref": "#/components/schemas/ApiVersion"},
           "requestId": {"$ref": "#/components/schemas/RequestId"},
-          "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify"]},
+          "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify", "SelectCertificate"]},
           "outcome": {"const": "success"},
           "decision": {"$ref": "#/components/schemas/Decision"},
           "result": {"type": "object"},
@@ -310,6 +333,9 @@
       },
       "ResolvePolicyResponse": {
         "allOf": [{"$ref": "#/components/schemas/SuccessEnvelope"}, {"type": "object", "properties": {"operation": {"const": "ResolvePolicy"}, "result": {"type": "object", "additionalProperties": false, "required": ["resolved"], "properties": {"resolved": {"const": true}}}}}]
+      },
+      "SelectCertificateResponse": {
+        "allOf": [{"$ref": "#/components/schemas/SuccessEnvelope"}, {"type": "object", "properties": {"operation": {"const": "SelectCertificate"}, "result": {"type": "object", "additionalProperties": false, "required": ["hostname", "certificateRef", "profile", "reloadRequired"], "properties": {"hostname": {"type": "string", "format": "hostname"}, "certificateRef": {"type": "string", "pattern": "^certificate:[a-z0-9:-]+$"}, "profile": {"$ref": "#/components/schemas/Profile"}, "reloadRequired": {"const": true}}}}}]
       },
       "KeyMetadata": {
         "type": "object",

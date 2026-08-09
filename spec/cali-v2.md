@@ -1,19 +1,19 @@
-# Cryptographic Abstraction Layer Interface — candidate v2
+# Cryptographic Abstraction Layer Interface v2.0
 
-Status: exploratory specification, version `2.0.0-draft`
+Status: exploratory specification, version `2.0.0`
 
-The key words **MUST**, **MUST NOT**, **SHOULD**, and **MAY** express candidate
+The key words **MUST**, **MUST NOT**, **SHOULD** and **MAY** express research
 requirements for experimentation. They do not imply standards-track status.
 
 ## 1. Scope
 
 CALI defines the decisions and evidence that a Common Crypto API implementation
-preserves between an authenticated consumer, policy authority, broker, and
-provider. A transport binding may be HTTP, gRPC, an in-process interface, or a
+preserves between an authenticated consumer, policy authority, broker and
+provider. A transport binding may be HTTP, gRPC, an in-process interface or a
 local IPC mechanism, provided it preserves the same semantics.
 
 CALI does not define cryptographic algorithms and does not replace PKCS#11,
-KMIP, KMS APIs, JCA, OpenSSL, certificate authorities, ACME, CMP, EST, TLS, or
+KMIP, KMS APIs, JCA, OpenSSL, certificate authorities, ACME, CMP, EST, TLS or
 application protocol negotiation.
 
 ## 2. Stable concepts
@@ -23,17 +23,17 @@ application protocol negotiation.
   and required security properties. Algorithms are substitutable only inside a
   profile whose wire and application semantics remain compatible.
 - **Policy decision** identifies one active policy version, profile, algorithm,
-  provider constraints, and key constraints.
-- **Key reference** is opaque, tenant-scoped, and version-aware. It does not by
+  provider constraints and key constraints.
+- **Key reference** is opaque, tenant-scoped and version-aware. It does not by
   itself prove custody or protection level.
-- **Capability statement** is authenticated, freshness-bounded, and scoped. It
+- **Capability statement** is authenticated, freshness-bounded and scoped. It
   reports possible behavior; it neither authorizes nor guarantees execution.
 - **Evidence** records the decision and execution identifiers without payloads,
-  credentials, private keys, or shared secrets.
+  credentials, private keys or shared secrets.
 
 ## 3. Common execution request
 
-Every policy-resolved cryptographic, key-lifecycle, or mutating operation request
+Every policy-resolved cryptographic, key-lifecycle or mutating operation request
 MUST contain:
 
 1. `apiVersion`;
@@ -47,34 +47,34 @@ MUST come from an authenticated channel or verified credential; a body field is
 not sufficient. Implementations MUST set size limits and MUST reject unknown
 critical fields or ambiguous input.
 
-Health, capability discovery, and authorized metadata reads MAY use binding-
+Health, capability discovery and authorized metadata reads MAY use binding-
 specific read requests without this body envelope. They still require the
 authenticated scope, freshness, authorization-before-disclosure, size limits,
-typed responses, and audit behavior defined by their operation profile.
+typed responses and audit behavior defined by their operation profile.
 
 ## 4. Processing model
 
 The broker MUST perform these steps in order:
 
 1. authenticate the caller and establish tenant/workload context;
-2. validate version, request ID, freshness, operation, intent, and encoding;
+2. validate version, request ID, freshness, operation, intent and encoding;
 3. authorize the intent and operation before disclosing scoped capability;
 4. resolve exactly one active policy decision and pin its version;
 5. compare the decision with caller minimum constraints;
 6. validate authenticated, fresh-enough provider capability;
-7. validate key tenant, version, state, purpose, and provider binding;
+7. validate key tenant, version, state, purpose and provider binding;
 8. dispatch exactly the resolved operation;
 9. return typed result and evidence; and
 10. emit a security event without secrets or unintended payload data.
 
 Any failure stops processing. Implementations MUST NOT silently select a weaker
-algorithm, different provider class, expired policy, older key version, or more
+algorithm, different provider class, expired policy, older key version or more
 exportable key.
 
 ## 5. Common response and evidence
 
 Policy-resolved execution success responses MUST correlate `requestId`, name the
-operation, and include:
+operation and include:
 
 - policy profile ID and version;
 - selected profile and algorithm identifier;
@@ -90,12 +90,12 @@ assurance unless an assurance profile defines and verifies such evidence.
 
 | Category | Required meaning | Retry default |
 | --- | --- | --- |
-| `INVALID_REQUEST` | Unsafe, malformed, oversized, ambiguous, or unsupported request | no |
+| `INVALID_REQUEST` | Unsafe, malformed, oversized, ambiguous or unsupported request | no |
 | `UNAUTHENTICATED` | No acceptable caller identity | after credential repair |
 | `UNAUTHORIZED` | Caller lacks permission | no |
 | `POLICY_NOT_FOUND` | No applicable decision | no |
 | `POLICY_AMBIGUOUS` | Multiple incompatible decisions remain | no |
-| `POLICY_INACTIVE` | Policy is early, expired, retired, or withdrawn | no |
+| `POLICY_INACTIVE` | Policy is early, expired, retired or withdrawn | no |
 | `CONSTRAINT_MISMATCH` | Decision violates a caller minimum | no |
 | `CAPABILITY_MISMATCH` | No allowed provider can preserve the profile | after administrative change |
 | `KEY_STATE_INVALID` | Key/version/purpose/state cannot perform the operation | no |
@@ -113,7 +113,7 @@ leak key existence across authorization boundaries or expose provider secrets.
 
 ## 7. Operation families
 
-| Family | Operations | Candidate contract status |
+| Family | Operations | Research contract status |
 | --- | --- | --- |
 | Discovery | capabilities, profiles, provider classes | specified; capabilities implemented |
 | Policy | resolve/dry-run, lifecycle, hierarchical evaluation | resolve implemented; lifecycle planned |
@@ -127,11 +127,11 @@ leak key existence across authorization boundaries or expose provider secrets.
 
 All operation-specific documents MUST define purpose, authorization, exact input
 interpretation, limits, idempotency/retry behavior, key states, output encoding,
-evidence, and error refinements.
+evidence and error refinements.
 
-The candidate cross-family shapes and invariants are defined in
+The cross family shapes and invariants are defined in
 [`operation-contracts.md`](operation-contracts.md). That document distinguishes
-implemented, specified, and reserved operations; specification does not imply
+implemented, specified and reserved operations; specification does not imply
 reference-service availability.
 
 ## 8. Artifact-signing profile v0
@@ -150,7 +150,7 @@ Profile identifier: `artifact-signing-v0` (experimental).
 - Sign requires the active key version. Verify MAY name an earlier retained
   version when lifecycle support is added.
 - Empty messages, malformed base64, unknown key references, non-signing keys,
-  inactive policy, and constraint mismatch fail explicitly.
+  inactive policy and constraint mismatch fail explicitly.
 
 This profile demonstrates processing semantics. It does not yet constitute a
 portable conformance profile because canonical vectors and a second
@@ -165,7 +165,7 @@ Destructive lifecycle actions require distinct authorization and evidence.
 
 ## 10. Versioning
 
-Specification, binding, schema, profile, policy, template, and algorithm catalog
+Specification, binding, schema, profile, policy, template and algorithm catalog
 versions are independent. Additive syntax is not automatically semantically
 compatible. A promoted version requires compatibility tests and a documented
 change classification.
@@ -175,4 +175,4 @@ change classification.
 An implementation MUST identify the exact profiles and binding versions it
 implements. Repository tests currently establish only behavior of the included
 reference slice. CALI conformance is undefined until the black-box runner,
-positive and negative vectors, and conformance policy are published.
+positive and negative vectors and conformance policy are published.

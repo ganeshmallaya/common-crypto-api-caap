@@ -16,11 +16,11 @@ the report remains private. Include:
 - any known workaround.
 
 Do not open a public issue for an undisclosed vulnerability or include private
-keys, credentials, customer data, exploit traffic, or other sensitive material.
+keys, credentials, customer data, exploit traffic or other sensitive material.
 
 The maintainer will acknowledge a valid private report when practical, assess
-it against the research status, and coordinate disclosure if a correction is
-published. No response-time, support, remediation, or security-assurance SLA is
+it against the research status and coordinate disclosure if a correction is
+published. No response-time, support, remediation or security-assurance SLA is
 offered.
 
 ## Supported versions

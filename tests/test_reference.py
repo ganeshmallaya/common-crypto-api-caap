@@ -1,5 +1,8 @@
 import base64
+import importlib.util
+import json
 import sys
+import tempfile
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -13,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "reference"))
 
 from cali_reference.broker import API_VERSION, Broker, CaliError, POLICY, RECOGNIZED_EXECUTION_OPERATIONS  # noqa: E402
+from cali_reference.policy import load_policy  # noqa: E402
 
 
 def request(operation, input_data, request_id="test-request-0001", constraints=None):
@@ -123,8 +127,6 @@ class BrokerTest(unittest.TestCase):
         self.assertIn("no-idempotency-store", capabilities["limitations"])
 
     def test_registry_execution_operations_are_recognized(self):
-        import json
-
         registry = json.loads((ROOT / "api/operation-registry.json").read_text())
         execution = {item["name"] for item in registry["operations"] if item["requestClass"] == "execution"}
         self.assertEqual(execution, RECOGNIZED_EXECUTION_OPERATIONS)
@@ -146,6 +148,68 @@ class BrokerTest(unittest.TestCase):
             self.broker.execute(request("UnknownOperation", {}), "tenant-a")
         except CaliError as error:
             self.assert_openapi_schema("ErrorEnvelope", error.response())
+
+    def certificate_request(self, version):
+        return {
+            "apiVersion": API_VERSION,
+            "requestId": f"apache-select-{version}",
+            "operation": "SelectCertificate",
+            "intent": "apache-tls",
+            "expectedPolicy": {
+                "profileId": "apache-pqc-migration",
+                "profileVersion": version,
+            },
+            "minimumConstraints": {"profile": "apache-pqc-migration"},
+            "input": {"hostname": "localhost"},
+        }
+
+    def test_transition_policy_selects_available_ecdsa_certificate(self):
+        policy = load_policy(ROOT / "examples/apache-pqc/policy-transition.json")
+        broker = Broker(policy, {"ecdsa-p256-sha256"})
+        _, response = broker.execute(self.certificate_request("transition-1"), "tenant-a")
+        self.assertEqual(response["result"]["profile"], "ecdsa-p256-sha256")
+        self.assertEqual(response["decision"]["policy"]["ruleId"], "www-example-transition")
+
+    def test_pqc_required_policy_fails_when_apache_lacks_mldsa(self):
+        policy = load_policy(ROOT / "examples/apache-pqc/policy-pqc-required.json")
+        broker = Broker(policy, {"ecdsa-p256-sha256"})
+        with self.assertRaises(CaliError) as raised:
+            broker.execute(self.certificate_request("pqc-required-1"), "tenant-a")
+        self.assertEqual(raised.exception.category, "CAPABILITY_MISMATCH")
+        self.assertEqual(broker.audit_events[-1]["outcome"], "failure")
+
+    def test_pqc_required_policy_selects_mldsa_when_available(self):
+        policy = load_policy(ROOT / "examples/apache-pqc/policy-pqc-required.json")
+        broker = Broker(policy, {"mldsa-65"})
+        _, response = broker.execute(self.certificate_request("pqc-required-1"), "tenant-a")
+        self.assertEqual(response["result"]["profile"], "mldsa-65")
+        self.assert_openapi_schema("SelectCertificateResponse", response)
+
+    def test_apache_fragment_uses_only_broker_selected_reference(self):
+        script = ROOT / "examples/apache-pqc/select_certificate.py"
+        spec = importlib.util.spec_from_file_location("select_certificate", script)
+        module = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "ecdsa-cert.pem").write_text("certificate")
+            (root / "ecdsa-key.pem").write_text("key")
+            output = root / "selected-certificate.conf"
+            module.render_fragment(
+                {
+                    "result": {
+                        "certificateRef": "certificate:apache:localhost:ecdsa",
+                        "profile": "ecdsa-p256-sha256",
+                    },
+                    "evidence": {"evidenceId": "evt_test"},
+                },
+                root,
+                output,
+            )
+            rendered = output.read_text()
+            self.assertIn(str((root / "ecdsa-cert.pem").resolve()), rendered)
+            self.assertIn("evt_test", rendered)
 
 
 if __name__ == "__main__":

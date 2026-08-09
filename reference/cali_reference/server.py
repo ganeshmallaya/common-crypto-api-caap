@@ -8,6 +8,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote, urlparse
 
 from .broker import Broker, CaliError
+from .policy import PolicyLoadError, load_policy
 
 
 MAX_BODY = 1024 * 1024
@@ -15,7 +16,7 @@ MAX_BODY = 1024 * 1024
 
 def make_handler(broker: Broker, auth_token: str | None = None):
     class Handler(BaseHTTPRequestHandler):
-        server_version = "CALIReference/0.2"
+        server_version = "CALIReference/2.0"
 
         def do_GET(self) -> None:  # noqa: N802
             try:
@@ -35,7 +36,7 @@ def make_handler(broker: Broker, auth_token: str | None = None):
         def do_POST(self) -> None:  # noqa: N802
             try:
                 self._authenticate()
-                route_operation = {"/v2/policies:resolve": "ResolvePolicy", "/v2/keys": "CreateKey", "/v2/sign": "Sign", "/v2/verify": "Verify"}.get(urlparse(self.path).path)
+                route_operation = {"/v2/policies:resolve": "ResolvePolicy", "/v2/keys": "CreateKey", "/v2/sign": "Sign", "/v2/verify": "Verify", "/v2/certificates:select": "SelectCertificate"}.get(urlparse(self.path).path)
                 if route_operation is None:
                     raise CaliError("INVALID_REQUEST", "route not found", status=404)
                 request = self._read_json()
@@ -91,7 +92,20 @@ def main() -> None:
     host = os.getenv("CALI_HOST", "127.0.0.1")
     port = int(os.getenv("CALI_PORT", "8080"))
     auth_token = os.getenv("CALI_AUTH_TOKEN") or None
-    server = ThreadingHTTPServer((host, port), make_handler(Broker(), auth_token))
+    policy_path = os.getenv("CALI_POLICY_FILE")
+    try:
+        certificate_policy = load_policy(policy_path) if policy_path else None
+    except PolicyLoadError as exc:
+        raise SystemExit(f"CALI policy error: {exc}") from exc
+    profiles = {
+        item.strip()
+        for item in os.getenv("CALI_CERTIFICATE_PROFILES", "ecdsa-p256-sha256").split(",")
+        if item.strip()
+    }
+    server = ThreadingHTTPServer(
+        (host, port),
+        make_handler(Broker(certificate_policy, profiles), auth_token),
+    )
     print(f"CALI research server listening on http://{host}:{port}")
     server.serve_forever()
 

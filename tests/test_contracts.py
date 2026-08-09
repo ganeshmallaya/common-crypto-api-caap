@@ -24,16 +24,22 @@ class RepositoryContractTest(unittest.TestCase):
         policy_schema = json.loads((ROOT / "schemas/policy-profile.schema.json").read_text())
         registry_schema = json.loads((ROOT / "schemas/operation-registry.schema.json").read_text())
         algorithm_profile_schema = json.loads((ROOT / "schemas/algorithm-profile.schema.json").read_text())
+        apache_policy_schema = json.loads((ROOT / "schemas/apache-certificate-policy.schema.json").read_text())
         Draft202012Validator.check_schema(request_schema)
         Draft202012Validator.check_schema(policy_schema)
         Draft202012Validator.check_schema(registry_schema)
         Draft202012Validator.check_schema(algorithm_profile_schema)
+        Draft202012Validator.check_schema(apache_policy_schema)
         Draft202012Validator(request_schema, format_checker=FormatChecker()).validate(
             json.loads((ROOT / "examples/create-key.example.json").read_text())
         )
         Draft202012Validator(policy_schema, format_checker=FormatChecker()).validate(
             json.loads((ROOT / "examples/policy-profile.example.json").read_text())
         )
+        for name in ("policy-transition.json", "policy-pqc-required.json"):
+            Draft202012Validator(apache_policy_schema, format_checker=FormatChecker()).validate(
+                json.loads((ROOT / "examples/apache-pqc" / name).read_text())
+            )
         registry = json.loads((ROOT / "api/operation-registry.json").read_text())
         Draft202012Validator(registry_schema).validate(registry)
         names = [operation["name"] for operation in registry["operations"]]
@@ -81,16 +87,17 @@ class RepositoryContractTest(unittest.TestCase):
         api = json.loads((ROOT / "api/openapi/cali-v2.openapi.json").read_text())
         validate(api)
         self.assertEqual(api["openapi"], "3.1.0")
-        self.assertEqual(api["info"]["version"], "2.0.0-draft")
+        self.assertEqual(api["info"]["version"], "2.0.0")
         self.assertEqual(
             set(api["paths"]),
-            {"/healthz", "/v2/capabilities", "/v2/policies:resolve", "/v2/keys", "/v2/keys/{keyRef}", "/v2/sign", "/v2/verify"},
+            {"/healthz", "/v2/capabilities", "/v2/policies:resolve", "/v2/certificates:select", "/v2/keys", "/v2/keys/{keyRef}", "/v2/sign", "/v2/verify"},
         )
 
     def test_openapi_operations_are_typed_and_maturity_labelled(self):
         api = json.loads((ROOT / "api/openapi/cali-v2.openapi.json").read_text())
         expected = {
             "resolvePolicy": "ResolvePolicyRequest",
+            "selectCertificate": "SelectCertificateRequest",
             "createKey": "CreateKeyRequest",
             "sign": "SignRequest",
             "verify": "VerifyRequest",

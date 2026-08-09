@@ -3,11 +3,11 @@
 CALI separates transport-independent semantics from concrete bindings:
 
 - [`../spec/cali-v2.md`](../spec/cali-v2.md) defines the core processing,
-  trust, failure, evidence, and versioning contract.
+  trust, failure, evidence and versioning contract.
 - [`../spec/operation-contracts.md`](../spec/operation-contracts.md) defines the
-  candidate shapes and invariants across every requested operation family.
+  research shapes and invariants across every requested operation family.
 - [`operation-registry.json`](operation-registry.json) provides a
-  machine-readable operation, maturity, state, key-material, and retry index.
+  machine-readable operation, maturity, state, key-material and retry index.
 - [`profiles/artifact-signing-v0.profile.json`](profiles/artifact-signing-v0.profile.json)
   is the source-level algorithm-profile record for the implemented slice.
 - [`openapi/cali-v2.openapi.json`](openapi/cali-v2.openapi.json) describes only

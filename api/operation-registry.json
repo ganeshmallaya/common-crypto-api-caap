@@ -1,12 +1,13 @@
 {
   "$schema": "../schemas/operation-registry.schema.json",
-  "registryVersion": "2.0.0-draft",
+  "registryVersion": "2.0.0",
   "status": "experimental",
   "operations": [
     {"name": "GetCapabilities", "family": "discovery", "maturity": "implemented", "requestClass": "read", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
     {"name": "ListProfiles", "family": "discovery", "maturity": "specified", "requestClass": "read", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
     {"name": "ResolvePolicy", "family": "policy", "maturity": "implemented", "requestClass": "execution", "mutatesState": false, "keyMaterial": "none", "retryDefault": "conditional", "referenceProfile": "artifact-signing-v0"},
     {"name": "DryRunPolicy", "family": "policy", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
+    {"name": "SelectCertificate", "family": "certificate-deployment", "maturity": "implemented", "requestClass": "execution", "mutatesState": false, "keyMaterial": "public", "retryDefault": "safe", "referenceProfile": "apache-pqc-migration"},
 
     {"name": "CreateKey", "family": "key", "maturity": "implemented", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional", "referenceProfile": "artifact-signing-v0"},
     {"name": "ReadKey", "family": "key", "maturity": "implemented", "requestClass": "read", "mutatesState": false, "keyMaterial": "public", "retryDefault": "safe", "referenceProfile": "artifact-signing-v0"},

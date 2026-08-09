@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "2.0.0",
+  "profileId": "apache-pqc-migration",
+  "profileVersion": "transition-1",
+  "status": "active",
+  "effectiveAt": "2026-08-01T00:00:00Z",
+  "expiresAt": null,
+  "rules": [
+    {
+      "ruleId": "www-example-transition",
+      "intent": "apache-tls",
+      "operation": "SelectCertificate",
+      "hostnames": ["localhost"],
+      "choices": [
+        {
+          "profile": "mldsa-65",
+          "algorithm": "urn:oid:2.16.840.1.101.3.4.3.18",
+          "certificateRef": "certificate:apache:localhost:mldsa65"
+        },
+        {
+          "profile": "ecdsa-p256-sha256",
+          "algorithm": "urn:oid:1.2.840.10045.4.3.2",
+          "certificateRef": "certificate:apache:localhost:ecdsa"
+        }
+      ]
+    }
+  ]
+}

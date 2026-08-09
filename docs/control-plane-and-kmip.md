@@ -1,4 +1,4 @@
-# Broker, policy, and KMIP boundaries
+# Broker, policy and KMIP boundaries
 
 Status: working research draft
 
@@ -10,7 +10,7 @@ not be the unconstrained author of that decision.
 ```text
 Enterprise risk owner
         |
-        | approves objectives, exceptions, and rollout
+        | approves objectives, exceptions and rollout
         v
 Policy authority / decision point
         |
@@ -20,14 +20,14 @@ CALI broker / enforcement point
         |
         | concrete operation and constrained provider request
         v
-Provider adapter ----> PKCS#11, KMIP, KMS API, library, or key store
+Provider adapter ----> PKCS#11, KMIP, KMS API, library or key store
 ```
 
 The policy authority is the **decision intelligence**. The broker is the
 **operational intelligence and enforcement point**. It performs contextual
 validation, capability matching, routing, handle resolution, safe retry
-handling, and evidence generation. It does not invent organizational risk
-policy, rank algorithms from first principles, or silently optimize around a
+handling and evidence generation. It does not invent organizational risk
+policy, rank algorithms from first principles or silently optimize around a
 rejection.
 
 This separation makes decisions reviewable and makes more than one broker
@@ -42,23 +42,23 @@ Ownership has two meanings and they should not be collapsed.
 The deploying enterprise owns:
 
 - risk appetite and protected-purpose definitions;
-- approved algorithms, providers, assurance levels, and exceptions;
-- effective dates, rollout waves, emergency actions, and rollback authority;
+- approved algorithms, providers, assurance levels and exceptions;
+- effective dates, rollout waves, emergency actions and rollback authority;
 - separation of duties and final approval; and
-- acceptance of protocol, verifier, data-migration, and availability risk.
+- acceptance of protocol, verifier, data-migration and availability risk.
 
 Industry bodies and public specifications can define vocabulary and
 interoperability rules. They cannot make a risk decision for an enterprise.
 
 ### Software ownership
 
-A vendor, cloud provider, open-source project, or enterprise platform team may
+A vendor, cloud provider, open-source project or enterprise platform team may
 implement the policy engine or broker. No single ownership model is mandated.
-Portable policy inputs, decision outputs, audit records, and conformance tests
+Portable policy inputs, decision outputs, audit records and conformance tests
 are the protection against that implementation becoming the standard.
 
 A practical deployment may use one vendor for policy authoring, another for a
-broker, and several providers. It may also use one integrated vendor product.
+broker and several providers. It may also use one integrated vendor product.
 Both should satisfy the same observable contracts.
 
 ## Policy framework responsibilities
@@ -67,20 +67,20 @@ The open policy framework should define:
 
 - stable intent and operation vocabulary;
 - authenticated decision inputs and their trust source;
-- rule applicability, priority, conflict, and ambiguity semantics;
+- rule applicability, priority, conflict and ambiguity semantics;
 - algorithm and construction identifiers with external registry references;
 - provider-class and key-protection constraints;
 - minimum security and interoperability constraints;
-- effective, expiry, deprecation, withdrawal, and exception lifecycle;
-- profile version, provenance, signature, trust anchor, and rollback rules;
+- effective, expiry, deprecation, withdrawal and exception lifecycle;
+- profile version, provenance, signature, trust anchor and rollback rules;
 - one decision or explicit rejection as the output;
 - explanation data sufficient to reproduce and audit a decision;
-- evaluation, simulation, staged activation, and compatibility-test behavior;
+- evaluation, simulation, staged activation and compatibility-test behavior;
   and
 - privacy rules for context and decision records.
 
 An open framework should not standardize a vendor's policy editor, risk score,
-workflow UI, approval product, analytics model, or content library. Those are
+workflow UI, approval product, analytics model or content library. Those are
 valid areas of differentiation.
 
 ## Broker responsibilities
@@ -88,29 +88,29 @@ valid areas of differentiation.
 For one operation, a conforming broker needs to preserve this sequence:
 
 1. Authenticate the caller from a trusted channel or workload identity.
-2. Establish tenant, workload, environment, and authorization context.
+2. Establish tenant, workload, environment and authorization context.
 3. Validate the API version, operation, intent, request identifier, freshness,
-   payload type, and non-negotiable constraints.
+   payload type and non-negotiable constraints.
 4. Authorize the intent and operation before exposing provider information.
 5. Request a decision from an identified policy authority or evaluate an
    authenticated, pinned profile.
-6. Reject missing, inactive, ambiguous, unsigned, rolled-back, or incompatible
+6. Reject missing, inactive, ambiguous, unsigned, rolled-back or incompatible
    policy.
 7. Resolve a logical key reference, if present, to authorized provider state.
 8. Match the decision against fresh-enough, authenticated, scoped provider
    capabilities and key metadata.
-9. Dispatch exactly one permitted operation, or dispatch a separately defined
+9. Dispatch exactly one permitted operation or dispatch a separately defined
    combined construction; never invent a fallback or composition.
 10. Normalize the outcome without discarding provider detail needed by an
     authorized operator.
-11. Return the policy, algorithm, provider, key, and timing references needed
+11. Return the policy, algorithm, provider, key and timing references needed
     for audit, subject to disclosure policy.
 12. Emit a tamper-evident event that contains no secret key material or
     unintended sensitive payload.
 
-Caching, load balancing, health checks, queuing, and route selection are broker
+Caching, load balancing, health checks, queuing and route selection are broker
 functions. A cached policy decision remains bound by provenance, expiry,
-rollback, and disconnected-operation rules.
+rollback and disconnected-operation rules.
 
 ## Common Crypto API behavior by operation
 
@@ -122,16 +122,16 @@ their mathematics in place.
 | --- | --- |
 | `GetCapabilities` | Returns a caller-scoped view of possible operations and constraints; it does not authorize a later operation. |
 | `ResolvePolicy` | Evaluates without executing and returns the pinned decision or rejection needed for planning and tests. |
-| `GenerateKeyPair` | Policy may select an allowed algorithm, provider class, key properties, and lifecycle requirements. The result is an opaque reference bound to the created key state. |
-| `Sign`, `Decapsulate`, or another private-key operation | The key's algorithm cannot change for this call. Policy authorizes the operation and confirms that the handle, algorithm, provider, and context remain allowed. |
+| `GenerateKeyPair` | Policy may select an allowed algorithm, provider class, key properties and lifecycle requirements. The result is an opaque reference bound to the created key state. |
+| `Sign`, `Decapsulate` or another private-key operation | The key's algorithm cannot change for this call. Policy authorizes the operation and confirms that the handle, algorithm, provider and context remain allowed. |
 | `Verify` or public-material operations | The input format may require an explicit algorithm or construction identifier for safe interpretation. Intent does not remove protocol encoding requirements. |
-| Successor-key migration | Orchestration creates or imports a new key, proves the required relationship, updates an authorized logical alias if used, coordinates certificates and verifiers, and retains lineage. This is not an ordinary signing call. |
+| Successor-key migration | Orchestration creates or imports a new key, proves the required relationship, updates an authorized logical alias if used, coordinates certificates and verifiers and retains lineage. This is not an ordinary signing call. |
 
-The candidate envelope in
+The research envelope in
 [`protocol-envelope.schema.json`](../schemas/protocol-envelope.schema.json)
 provides a request identifier, version, operation, intent, expected-policy pin,
-minimum constraints, and typed operation input. The response provides outcome,
-policy and algorithm references, provider reference, result, or a structured
+minimum constraints and typed operation input. The response provides outcome,
+policy and algorithm references, provider reference, result or a structured
 error. The schema is experimental and does not yet define a normative wire
 binding.
 
@@ -149,14 +149,14 @@ No single component should hold all intelligence.
 | Did the intended change occur? | Broker telemetry plus independent observation |
 
 The broker is therefore more than a proxy but less than an autonomous security
-authority. Its intelligence is constrained, deterministic, and explainable.
+authority. Its intelligence is constrained, deterministic and explainable.
 
 ## KMIP relationship
 
 KMIP is complementary and should be a first-class southbound integration.
 OASIS KMIP defines client-server operations for managed objects such as keys
 and certificates. Its profiles cover key lifecycle and cryptographic services,
-including encryption, decryption, signing, and verification. KMIP requests can
+including encryption, decryption, signing and verification. KMIP requests can
 carry concrete cryptographic algorithms and parameters.
 
 CALI operates one layer above that contract:
@@ -164,16 +164,16 @@ CALI operates one layer above that contract:
 | CALI concept | KMIP relationship |
 | --- | --- |
 | Intent, such as `artifact-signing` | Not replaced by a KMIP object name or operation-policy name; resolved before dispatch |
-| Policy decision | Selects the permitted algorithm, parameters, assurance, and provider class |
+| Policy decision | Selects the permitted algorithm, parameters, assurance and provider class |
 | Logical key reference | Broker-owned opaque reference mapped to a KMIP Unique Identifier within an authorized provider context |
-| Capability descriptor | May be populated from KMIP Query, profile, capability, and managed-object information, then scoped and authenticated by the adapter |
-| Key generation and lifecycle | Adapter maps approved CALI operations to KMIP Create, Create Key Pair, Re-key, Register, Destroy, or related operations when their semantics match |
-| Cryptographic execution | Adapter maps to KMIP Encrypt, Decrypt, Sign, Signature Verify, MAC, or other supported operations |
+| Capability descriptor | May be populated from KMIP Query, profile, capability and managed-object information, then scoped and authenticated by the adapter |
+| Key generation and lifecycle | Adapter maps approved CALI operations to KMIP Create, Create Key Pair, Re-key, Register, Destroy or related operations when their semantics match |
+| Cryptographic execution | Adapter maps to KMIP Encrypt, Decrypt, Sign, Signature Verify, MAC or other supported operations |
 | Provider error | Adapter preserves KMIP result status and reason for operators while mapping it to a stable CALI error category |
 
 The adapter must not translate by name alone. It must check operation
 semantics, algorithm and parameter identifiers, object state, usage mask,
-extractability, activation dates, tenant authorization, and provider profile.
+extractability, activation dates, tenant authorization and provider profile.
 
 ### What CALI must not claim about KMIP
 
@@ -191,12 +191,12 @@ extractability, activation dates, tenant authorization, and provider profile.
 ## Recommended implementation split
 
 The open CALI work should own the northbound and southbound semantics, policy
-decision contract, minimum audit vocabulary, failure behavior, and conformance
+decision contract, minimum audit vocabulary, failure behavior and conformance
 tests. An initial reference implementation should include a small broker and a
 KMIP adapter, but should not become the only valid implementation.
 
 Vendors should own production policy engines, broker deployments, adapters,
-high availability, user experience, migration orchestration, assurance, and
+high availability, user experience, migration orchestration, assurance and
 support. Enterprises should retain approval of active policy and trust anchors.
 
 ## Sources

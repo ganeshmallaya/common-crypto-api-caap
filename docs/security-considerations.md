@@ -4,17 +4,17 @@ Status: working research draft
 
 CALI centralizes a high-impact decision: which cryptographic mechanism and
 provider will act for a caller. Centralization can improve visibility and
-control, but it also concentrates policy, identity, routing, and availability
+control, but it also concentrates policy, identity, routing and availability
 risk. A stable API is not itself a security boundary.
 
 ## Policy integrity and lifecycle
 
 A deployment needs authenticated policy provenance, explicit effective and
-expiry times, rollback resistance, and an emergency withdrawal process. The
+expiry times, rollback resistance and an emergency withdrawal process. The
 broker must identify the exact profile and version used. Cached policy requires
 bounded lifetime and defined disconnected behavior.
 
-Policy ambiguity, absence, inactivity, and constraint conflict are failures.
+Policy ambiguity, absence, inactivity and constraint conflict are failures.
 They are not reasons to select a default.
 
 ## Authorization before capability
@@ -26,8 +26,8 @@ a key merely by learning or presenting its reference.
 ## Key custody and references
 
 Private keys should remain behind opaque references by default. References must
-be unpredictable, tenant-bound, non-reusable, and checked against current key
-state. Import, export, wrap, unwrap, backup, restore, and destruction require
+be unpredictable, tenant-bound, non-reusable and checked against current key
+state. Import, export, wrap, unwrap, backup, restore and destruction require
 separate semantics and authorization; they are not implied by a generic key
 operation.
 
@@ -39,7 +39,7 @@ establish either claim.
 
 The caller and policy may express minimum constraints. Resolution must preserve
 them through dispatch. Automatic fallback to a weaker algorithm, different key
-protection, an unapproved provider, or an expired profile is unsafe even during
+protection, an unapproved provider or an expired profile is unsafe even during
 an outage.
 
 Comparison of algorithm strength is not reduced to one universal number. The
@@ -49,8 +49,8 @@ sources.
 ## Input and encoding safety
 
 Sign and verify operations need an explicit distinction between messages,
-digests, and structured protocol objects. Algorithm identifiers alone do not
-define all parameter, context-string, signature, public-key, ciphertext, or
+digests and structured protocol objects. Algorithm identifiers alone do not
+define all parameter, context-string, signature, public-key, ciphertext or
 combined-output encodings. Normative bindings need canonical encodings and test
 vectors.
 
@@ -58,11 +58,11 @@ vectors.
 
 CALI must not create a combined construction by merely running two algorithms
 and concatenating outputs. Composition, combiner behavior, validation,
-encoding, failure handling, and security properties require an external or
+encoding, failure handling and security properties require an external or
 separately reviewed definition. Until then, combined-operation examples are
 illustrative only.
 
-## Authentication, replay, and retries
+## Authentication, replay and retries
 
 Remote deployments need authenticated and integrity-protected channels plus
 caller identity suitable for workload authorization. Request IDs support
@@ -73,26 +73,26 @@ security and audit consequences.
 ## Audit and privacy
 
 Audit events should capture caller identity, tenant, operation, intent, policy
-version, selected identifiers, provider reference, result category, and timing.
-They must not capture private keys, shared secrets, credentials, or unintended
+version, selected identifiers, provider reference, result category and timing.
+They must not capture private keys, shared secrets, credentials or unintended
 sensitive payloads. Provider details may also reveal infrastructure and require
 access controls.
 
-Audit integrity, retention, secure time, and failure behavior are deployment
+Audit integrity, retention, secure time and failure behavior are deployment
 requirements. Logging failure must not silently erase accountability.
 
 ## Availability
 
-The broker, policy service, and providers may become shared dependencies.
-Deployments need capacity isolation, bounded queues, timeouts, rate limits, and
+The broker, policy service and providers may become shared dependencies.
+Deployments need capacity isolation, bounded queues, timeouts, rate limits and
 a consciously selected fail-closed behavior. An emergency policy is still a
-policy; it must be authenticated, time-bounded, auditable, and constrained.
+policy; it must be authenticated, time-bounded, auditable and constrained.
 
 ## Implementation and supply chain
 
 Production-capable implementations need dependency review, secure update mechanisms,
-secret scanning, reproducible interface artifacts where practical, and tests
-that compare prose, schemas, and code. A reference implementation demonstrates
+secret scanning, reproducible interface artifacts where practical and tests
+that compare prose, schemas and code. A reference implementation demonstrates
 one interpretation; it does not prove that the design or cryptography is safe.
 
 ## Research-site publication

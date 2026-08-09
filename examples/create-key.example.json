@@ -1,5 +1,5 @@
 {
-  "apiVersion": "2.0.0-draft",
+  "apiVersion": "2.0.0",
   "requestId": "example-create-0001",
   "operation": "CreateKey",
   "intent": "artifact-signing",

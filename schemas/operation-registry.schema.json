@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/ganeshmallaya/common-crypto-api-caap/main/schemas/operation-registry.schema.json",
+  "$id": "https://raw.githubusercontent.com/ganeshmallaya/cali-crypto-interface/main/schemas/operation-registry.schema.json",
   "title": "CALI experimental operation registry",
   "type": "object",
   "additionalProperties": false,
   "required": ["$schema", "registryVersion", "status", "operations"],
   "properties": {
     "$schema": {"type": "string"},
-    "registryVersion": {"const": "2.0.0-draft"},
+    "registryVersion": {"const": "2.0.0"},
     "status": {"const": "experimental"},
     "operations": {
       "type": "array",
@@ -18,7 +18,7 @@
         "required": ["name", "family", "maturity", "requestClass", "mutatesState", "keyMaterial", "retryDefault"],
         "properties": {
           "name": {"type": "string", "pattern": "^[A-Z][A-Za-z0-9]{2,63}$"},
-          "family": {"enum": ["discovery", "policy", "key", "signature", "mac", "encryption", "digest", "random", "establishment", "streaming"]},
+          "family": {"enum": ["discovery", "policy", "certificate-deployment", "key", "signature", "mac", "encryption", "digest", "random", "establishment", "streaming"]},
           "maturity": {"enum": ["implemented", "specified", "reserved"]},
           "requestClass": {"enum": ["read", "execution"]},
           "mutatesState": {"type": "boolean"},

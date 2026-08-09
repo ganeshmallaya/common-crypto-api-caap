@@ -5,14 +5,14 @@ Status: initial research threat model
 ## Scope
 
 This model covers the CALI consumer, broker, policy path, provider adapter,
-cryptographic backend, and research-site publication boundary. It does not prove
+cryptographic backend and research-site publication boundary. It does not prove
 that a particular deployment is secure.
 
 ## Protected assets
 
 - Private keys and derived secrets
 - Authorization and caller identity
-- Policy profiles, lifecycle state, and provenance
+- Policy profiles, lifecycle state and provenance
 - Algorithm and provider resolution decisions
 - Key references and their tenant binding
 - Capability descriptors
@@ -26,15 +26,15 @@ that a particular deployment is secure.
 - An authenticated caller exceeding its authorization
 - A compromised consumer or workload
 - A malicious or compromised policy publisher or distribution path
-- A malicious, compromised, or incorrectly configured provider
+- A malicious, compromised or incorrectly configured provider
 - A cross-tenant attacker
 - An operator making an unsafe policy or lifecycle change
-- A supply-chain attacker modifying code, schemas, dependencies, or site content
+- A supply-chain attacker modifying code, schemas, dependencies or site content
 - A website pipeline copying unreviewed research material
 
-## Trust-boundary threats and candidate controls
+## Trust boundary threats and research controls
 
-| Threat | Boundary | Candidate controls to evaluate |
+| Threat | Boundary | Research controls to evaluate |
 | --- | --- | --- |
 | Algorithm downgrade | Policy and broker | Authenticated profiles, minimum constraints, lifecycle enforcement, rollback detection, explicit rejection |
 | Policy substitution | Policy distribution | Provenance verification, version pinning, allowlisted authority, expiry, tamper-evident audit |
@@ -48,7 +48,7 @@ that a particular deployment is secure.
 | Secret leakage | Runtime and observability | No secrets in logs, protected secret delivery, memory handling, least privilege, redaction tests |
 | Denial of service | Network, broker, provider | Admission control, quotas, bounded work, timeouts, circuit breakers, capacity isolation |
 | Audit deletion or forgery | Broker and audit sink | Restricted write path, integrity protection, secure time, retention, independent monitoring |
-| Unreviewed website publication | Repository and website | protected branches, native-page review, explicit approval, and authoritative source links |
+| Unreviewed website publication | Repository and website | protected branches, native-page review, explicit approval and authoritative source links |
 
 ## Important abuse cases
 
@@ -68,20 +68,20 @@ alternative while still meeting minimum constraints.
 ### Stale capability cache
 
 The broker routes an operation based on a descriptor that no longer represents
-provider state. Descriptors need scope and freshness semantics, and the provider
+provider state. Descriptors need scope and freshness semantics and the provider
 must still enforce operation authorization at execution.
 
 ### Rebound key reference
 
 A reference is deleted and later resolves to different key material or another
-tenant. References need stable identity, lifecycle state, non-reuse rules, and
+tenant. References need stable identity, lifecycle state, non-reuse rules and
 tenant authorization independent of identifier possession.
 
 ### Draft publication
 
 A website job publishes research text from an unreviewed branch or working tree.
 The public boundary needs protected source branches, reviewed native pages,
-recorded source commits, authoritative repository links, and explicit approval.
+recorded source commits, authoritative repository links and explicit approval.
 
 ## Out of scope for this version
 
@@ -95,5 +95,5 @@ recorded source commits, authoritative repository links, and explicit approval.
 ## Validation work required
 
 This threat model should drive negative protocol tests, policy-conflict tests,
-tenant-isolation tests, replay tests, publication-gate tests, and deployment-specific
+tenant-isolation tests, replay tests, publication-gate tests and deployment-specific
 reviews. None are claimed complete merely because they are listed here.
