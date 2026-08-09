@@ -1,6 +1,6 @@
 {
   "$schema": "../schemas/policy-profile.schema.json",
-  "schemaVersion": "0.2.0-draft",
+  "schemaVersion": "2.0.0-draft",
   "profileId": "baseline-artifact-signing",
   "profileVersion": "1",
   "status": "active",

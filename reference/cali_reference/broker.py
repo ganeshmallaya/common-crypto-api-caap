@@ -1,4 +1,4 @@
-"""Minimal CAAP broker and software provider for the artifact-signing profile."""
+"""Minimal CALI broker and software provider for the artifact-signing profile."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 
-API_VERSION = "0.2.0-draft"
+API_VERSION = "2.0.0-draft"
 PROFILE = "artifact-signing-v0"
 ALGORITHM = "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519"
 POLICY = {"profileId": "baseline-artifact-signing", "profileVersion": "1"}
@@ -32,7 +32,7 @@ RECOGNIZED_EXECUTION_OPERATIONS = {
 }
 
 
-class CaapError(Exception):
+class CaliError(Exception):
     def __init__(self, category: str, message: str, *, retryable: bool = False, status: int = 400):
         super().__init__(message)
         self.category = category
@@ -72,14 +72,14 @@ def _b64encode(value: bytes) -> str:
 
 def _b64decode(value: Any, field: str) -> bytes:
     if not isinstance(value, str) or not value:
-        raise CaapError("INVALID_REQUEST", f"{field} must be non-empty unpadded base64")
+        raise CaliError("INVALID_REQUEST", f"{field} must be non-empty unpadded base64")
     if "=" in value:
-        raise CaapError("INVALID_REQUEST", f"{field} must use canonical unpadded base64")
+        raise CaliError("INVALID_REQUEST", f"{field} must use canonical unpadded base64")
     try:
         padded = value + "=" * (-len(value) % 4)
         return base64.b64decode(padded, validate=True)
     except (binascii.Error, ValueError) as exc:
-        raise CaapError("INVALID_REQUEST", f"{field} is not valid unpadded base64") from exc
+        raise CaliError("INVALID_REQUEST", f"{field} is not valid unpadded base64") from exc
 
 
 class Broker:
@@ -112,8 +112,8 @@ class Broker:
                 return 200, self._sign(request, tenant)
             if operation == "Verify":
                 return 200, self._verify(request, tenant)
-            raise CaapError("NOT_IMPLEMENTED", f"operation {operation!r} is recognized but not implemented", status=501)
-        except CaapError as exc:
+            raise CaliError("NOT_IMPLEMENTED", f"operation {operation!r} is recognized but not implemented", status=501)
+        except CaliError as exc:
             self._record_failure(request, tenant, exc)
             raise
 
@@ -123,52 +123,52 @@ class Broker:
 
     def _validate_common(self, request: Any) -> None:
         if not isinstance(request, dict):
-            raise CaapError("INVALID_REQUEST", "request body must be a JSON object")
+            raise CaliError("INVALID_REQUEST", "request body must be a JSON object")
         allowed = {"apiVersion", "requestId", "operation", "intent", "expectedPolicy", "minimumConstraints", "input"}
         unknown = sorted(set(request) - allowed)
         if unknown:
-            raise CaapError("INVALID_REQUEST", f"unknown fields: {', '.join(unknown)}")
+            raise CaliError("INVALID_REQUEST", f"unknown fields: {', '.join(unknown)}")
         required = {"apiVersion", "requestId", "operation", "intent", "minimumConstraints", "input"}
         missing = sorted(required - set(request))
         if missing:
-            raise CaapError("INVALID_REQUEST", f"missing fields: {', '.join(missing)}")
+            raise CaliError("INVALID_REQUEST", f"missing fields: {', '.join(missing)}")
         if request["apiVersion"] != API_VERSION:
-            raise CaapError("INVALID_REQUEST", "unsupported apiVersion")
+            raise CaliError("INVALID_REQUEST", "unsupported apiVersion")
         request_id = request["requestId"]
         if not isinstance(request_id, str) or not 8 <= len(request_id) <= 128 or not all(c.isalnum() or c in "._:-" for c in request_id):
-            raise CaapError("INVALID_REQUEST", "invalid requestId")
+            raise CaliError("INVALID_REQUEST", "invalid requestId")
         if request["intent"] != "artifact-signing":
-            raise CaapError("POLICY_NOT_FOUND", "no policy for requested intent")
+            raise CaliError("POLICY_NOT_FOUND", "no policy for requested intent")
         if not isinstance(request["operation"], str) or request["operation"] not in RECOGNIZED_EXECUTION_OPERATIONS:
-            raise CaapError("INVALID_REQUEST", "unknown operation")
+            raise CaliError("INVALID_REQUEST", "unknown operation")
         if not isinstance(request["minimumConstraints"], dict) or not isinstance(request["input"], dict):
-            raise CaapError("INVALID_REQUEST", "minimumConstraints and input must be objects")
+            raise CaliError("INVALID_REQUEST", "minimumConstraints and input must be objects")
 
     def _decision(self, request: dict[str, Any]) -> dict[str, Any]:
         expected = request.get("expectedPolicy")
         if expected is not None and expected != POLICY:
-            raise CaapError("POLICY_INACTIVE", "expected policy is not the active pinned policy")
+            raise CaliError("POLICY_INACTIVE", "expected policy is not the active pinned policy")
         constraints = request["minimumConstraints"]
         if constraints.get("profile", PROFILE) != PROFILE:
-            raise CaapError("CONSTRAINT_MISMATCH", "requested profile is unsupported")
+            raise CaliError("CONSTRAINT_MISMATCH", "requested profile is unsupported")
         allowed_classes = constraints.get("providerClasses", ["software"])
         if not isinstance(allowed_classes, list) or "software" not in allowed_classes:
-            raise CaapError("CAPABILITY_MISMATCH", "no allowed provider class can execute this profile")
+            raise CaliError("CAPABILITY_MISMATCH", "no allowed provider class can execute this profile")
         unknown = set(constraints) - {"profile", "providerClasses"}
         if unknown:
-            raise CaapError("INVALID_REQUEST", f"unknown minimum constraints: {', '.join(sorted(unknown))}")
+            raise CaliError("INVALID_REQUEST", f"unknown minimum constraints: {', '.join(sorted(unknown))}")
         return {"policy": POLICY, "profile": PROFILE, "algorithm": ALGORITHM, "providerRef": PROVIDER_REF}
 
     def _resolve(self, request: dict[str, Any], tenant: str) -> dict[str, Any]:
         if request["input"]:
-            raise CaapError("INVALID_REQUEST", "ResolvePolicy input must be empty")
+            raise CaliError("INVALID_REQUEST", "ResolvePolicy input must be empty")
         return self._response(request, tenant, self._decision(request), {"resolved": True})
 
     def _create_key(self, request: dict[str, Any], tenant: str) -> dict[str, Any]:
         decision = self._decision(request)
         input_data = request["input"]
         if set(input_data) - {"purpose"} or input_data.get("purpose") != "sign":
-            raise CaapError("INVALID_REQUEST", "CreateKey requires input.purpose='sign'")
+            raise CaliError("INVALID_REQUEST", "CreateKey requires input.purpose='sign'")
         key = KeyRecord(tenant, "key_" + secrets.token_urlsafe(18), 1, "sign", "active", Ed25519PrivateKey.generate(), _now())
         self._keys[key.key_ref] = key
         return self._response(request, tenant, decision, self._key_metadata(key))
@@ -177,7 +177,7 @@ class Broker:
         decision = self._decision(request)
         input_data = request["input"]
         if set(input_data) != {"keyRef", "message"}:
-            raise CaapError("INVALID_REQUEST", "Sign input requires only keyRef and message")
+            raise CaliError("INVALID_REQUEST", "Sign input requires only keyRef and message")
         key = self._get_key(input_data["keyRef"], tenant)
         message = _b64decode(input_data["message"], "input.message")
         signature = key.private_key.sign(message)
@@ -187,7 +187,7 @@ class Broker:
         decision = self._decision(request)
         input_data = request["input"]
         if set(input_data) != {"keyRef", "message", "signature"}:
-            raise CaapError("INVALID_REQUEST", "Verify input requires only keyRef, message, and signature")
+            raise CaliError("INVALID_REQUEST", "Verify input requires only keyRef, message, and signature")
         key = self._get_key(input_data["keyRef"], tenant)
         message = _b64decode(input_data["message"], "input.message")
         signature = _b64decode(input_data["signature"], "input.signature")
@@ -200,12 +200,12 @@ class Broker:
 
     def _get_key(self, key_ref: Any, tenant: str) -> KeyRecord:
         if not isinstance(key_ref, str):
-            raise CaapError("INVALID_REQUEST", "keyRef must be a string")
+            raise CaliError("INVALID_REQUEST", "keyRef must be a string")
         key = self._keys.get(key_ref)
         if key is None or key.tenant != tenant:
-            raise CaapError("KEY_STATE_INVALID", "key is unavailable for this caller", status=404)
+            raise CaliError("KEY_STATE_INVALID", "key is unavailable for this caller", status=404)
         if key.state != "active" or key.purpose != "sign":
-            raise CaapError("KEY_STATE_INVALID", "key state or purpose does not permit this operation")
+            raise CaliError("KEY_STATE_INVALID", "key state or purpose does not permit this operation")
         return key
 
     def _key_metadata(self, key: KeyRecord) -> dict[str, Any]:
@@ -219,7 +219,7 @@ class Broker:
         self.audit_events.append(event)
         return {"apiVersion": API_VERSION, "requestId": request["requestId"], "operation": request["operation"], "outcome": "success", "decision": decision, "result": result, "evidence": {"evidenceId": evidence_id, "decisionAt": timestamp, "executedAt": timestamp}}
 
-    def _record_failure(self, request: Any, tenant: str, error: CaapError) -> None:
+    def _record_failure(self, request: Any, tenant: str, error: CaliError) -> None:
         request_id = request.get("requestId") if isinstance(request, dict) and isinstance(request.get("requestId"), str) else "unavailable"
         operation = request.get("operation") if isinstance(request, dict) and isinstance(request.get("operation"), str) else "unavailable"
         timestamp = _now()

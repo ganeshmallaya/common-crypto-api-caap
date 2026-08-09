@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "CAAP Common Crypto API — reference HTTP binding",
-    "version": "0.2.0-draft",
+    "title": "CALI Common Crypto API — reference HTTP binding",
+    "version": "2.0.0-draft",
     "description": "Typed HTTP/JSON binding for the implemented artifact-signing research slice. Cross-family candidate semantics are defined in spec/operation-contracts.md. This document is not production guidance or a conformance claim.",
     "license": {
       "name": "Proprietary — all rights reserved"
@@ -31,7 +31,7 @@
         "operationId": "health",
         "summary": "Report process liveness",
         "tags": ["Service"],
-        "x-caap-maturity": "implemented",
+        "x-cali-maturity": "implemented",
         "responses": {
           "200": {
             "description": "Process is running",
@@ -41,12 +41,12 @@
         }
       }
     },
-    "/v1/capabilities": {
+    "/v2/capabilities": {
       "get": {
         "operationId": "getCapabilities",
         "summary": "Return the scoped capabilities of this reference process",
         "tags": ["Discovery"],
-        "x-caap-maturity": "implemented",
+        "x-cali-maturity": "implemented",
         "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
         "responses": {
           "200": {
@@ -58,13 +58,13 @@
         }
       }
     },
-    "/v1/policies:resolve": {
+    "/v2/policies:resolve": {
       "post": {
         "operationId": "resolvePolicy",
         "summary": "Resolve and pin the artifact-signing policy",
         "tags": ["Policy"],
-        "x-caap-maturity": "implemented",
-        "x-caap-profile": "artifact-signing-v0",
+        "x-cali-maturity": "implemented",
+        "x-cali-profile": "artifact-signing-v0",
         "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
         "requestBody": {"$ref": "#/components/requestBodies/ResolvePolicyRequest"},
         "responses": {
@@ -74,13 +74,13 @@
         }
       }
     },
-    "/v1/keys": {
+    "/v2/keys": {
       "post": {
         "operationId": "createKey",
         "summary": "Create an in-memory Ed25519 signing key",
         "tags": ["Keys"],
-        "x-caap-maturity": "implemented",
-        "x-caap-profile": "artifact-signing-v0",
+        "x-cali-maturity": "implemented",
+        "x-cali-profile": "artifact-signing-v0",
         "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
         "requestBody": {"$ref": "#/components/requestBodies/CreateKeyRequest"},
         "responses": {
@@ -90,12 +90,12 @@
         }
       }
     },
-    "/v1/keys/{keyRef}": {
+    "/v2/keys/{keyRef}": {
       "get": {
         "operationId": "readKey",
         "summary": "Read authorized non-secret key metadata",
         "tags": ["Keys"],
-        "x-caap-maturity": "implemented",
+        "x-cali-maturity": "implemented",
         "parameters": [
           {"$ref": "#/components/parameters/KeyRef"},
           {"$ref": "#/components/parameters/DevelopmentTenant"}
@@ -107,13 +107,13 @@
         }
       }
     },
-    "/v1/sign": {
+    "/v2/sign": {
       "post": {
         "operationId": "sign",
         "summary": "Sign message bytes exactly once",
         "tags": ["Signature"],
-        "x-caap-maturity": "implemented",
-        "x-caap-profile": "artifact-signing-v0",
+        "x-cali-maturity": "implemented",
+        "x-cali-profile": "artifact-signing-v0",
         "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
         "requestBody": {"$ref": "#/components/requestBodies/SignRequest"},
         "responses": {
@@ -123,13 +123,13 @@
         }
       }
     },
-    "/v1/verify": {
+    "/v2/verify": {
       "post": {
         "operationId": "verify",
         "summary": "Verify a signature over message bytes",
         "tags": ["Signature"],
-        "x-caap-maturity": "implemented",
-        "x-caap-profile": "artifact-signing-v0",
+        "x-cali-maturity": "implemented",
+        "x-cali-profile": "artifact-signing-v0",
         "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
         "requestBody": {"$ref": "#/components/requestBodies/VerifyRequest"},
         "responses": {
@@ -145,12 +145,12 @@
       "developmentBearer": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Optional development-only bearer token enabled with CAAP_AUTH_TOKEN. Production CAAP deployments require an authenticated workload identity and channel binding."
+        "description": "Optional development-only bearer token enabled with CALI_AUTH_TOKEN. Production CALI deployments require an authenticated workload identity and channel binding."
       }
     },
     "parameters": {
       "DevelopmentTenant": {
-        "name": "X-CAAP-Tenant",
+        "name": "X-CALI-Tenant",
         "in": "header",
         "required": false,
         "description": "Development test-harness tenant. It is not trusted authentication and defaults to local-dev.",
@@ -178,7 +178,7 @@
     },
     "responses": {
       "ClientError": {
-        "description": "Explicit CAAP request, authorization, policy, capability, or key failure",
+        "description": "Explicit CALI request, authorization, policy, capability, or key failure",
         "headers": {"Cache-Control": {"$ref": "#/components/headers/NoStore"}},
         "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}
       },
@@ -192,7 +192,7 @@
       }
     },
     "schemas": {
-      "ApiVersion": {"type": "string", "const": "0.2.0-draft"},
+      "ApiVersion": {"type": "string", "const": "2.0.0-draft"},
       "RequestId": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{8,128}$"},
       "Intent": {"type": "string", "const": "artifact-signing"},
       "Profile": {"type": "string", "const": "artifact-signing-v0"},

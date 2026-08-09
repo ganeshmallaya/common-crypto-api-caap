@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ganeshmallaya.github.io/common-crypto-api-caap/schemas/protocol-envelope.schema.json",
-  "title": "CAAP Common Crypto API request",
-  "description": "Experimental request envelope for the implemented artifact-signing 0.2.0-draft HTTP slice.",
+  "$id": "https://raw.githubusercontent.com/ganeshmallaya/common-crypto-api-caap/main/schemas/protocol-envelope.schema.json",
+  "title": "CALI Common Crypto API request",
+  "description": "Experimental request envelope for the implemented artifact-signing 2.0.0-draft HTTP slice.",
   "type": "object",
   "additionalProperties": false,
   "required": ["apiVersion", "requestId", "operation", "intent", "minimumConstraints", "input"],
   "properties": {
     "$schema": {"type": "string"},
-    "apiVersion": {"const": "0.2.0-draft"},
+    "apiVersion": {"const": "2.0.0-draft"},
     "requestId": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{8,128}$"},
     "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify"]},
     "intent": {"const": "artifact-signing"},

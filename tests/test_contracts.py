@@ -38,8 +38,12 @@ class RepositoryContractTest(unittest.TestCase):
         Draft202012Validator(registry_schema).validate(registry)
         names = [operation["name"] for operation in registry["operations"]]
         self.assertEqual(len(names), len(set(names)))
-        algorithm_profile = json.loads((ROOT / "api/profiles/artifact-signing-v0.profile.json").read_text())
-        Draft202012Validator(algorithm_profile_schema, format_checker=FormatChecker()).validate(algorithm_profile)
+        profiles = []
+        for path in sorted((ROOT / "api/profiles").glob("*.profile.json")):
+            profile = json.loads(path.read_text())
+            Draft202012Validator(algorithm_profile_schema, format_checker=FormatChecker()).validate(profile)
+            profiles.append(profile)
+        algorithm_profile = next(profile for profile in profiles if profile["profileId"] == "artifact-signing-v0")
         policy = json.loads((ROOT / "examples/policy-profile.example.json").read_text())
         self.assertEqual(policy["rules"][0]["decision"]["profile"], algorithm_profile["profileId"])
         self.assertEqual(policy["rules"][0]["decision"]["algorithm"], algorithm_profile["algorithms"][0]["identifier"])
@@ -51,19 +55,15 @@ class RepositoryContractTest(unittest.TestCase):
 
     def test_canonical_naming(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("Crypto Agility Algorithm Protocol (CAAP)", readme)
+        self.assertIn("Cryptographic Abstraction Layer Interface (CALI)", readme)
         self.assertIn("**Common Crypto API**", readme)
 
     def test_canonical_site_integration_is_consistent(self):
         canonical = "https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/"
-        for relative in ("README.md", "site/index.html", "site/README.md", "docs/personal-site-integration.md"):
+        for relative in ("README.md", "docs/personal-site-integration.md"):
             self.assertIn(canonical, (ROOT / relative).read_text(encoding="utf-8"))
-        fragment = json.loads((ROOT / "integration/personal-site/vercel-rewrites.fragment.json").read_text())
-        self.assertEqual(fragment["rewrites"][0]["source"], "/research/crypto-agility-algorithm-protocol")
-        self.assertEqual(fragment["rewrites"][1]["source"], "/research/crypto-agility-algorithm-protocol/:path*")
-        self.assertEqual(fragment["rewrites"][0]["destination"], "https://ganeshmallaya.github.io/common-crypto-api-caap/")
-        self.assertEqual(fragment["redirects"][0], {"source": "/research", "destination": "/research/crypto-agility-algorithm-protocol/", "permanent": True})
-        self.assertEqual(fragment["redirects"][1]["destination"], "/research/crypto-agility-algorithm-protocol/")
+        self.assertFalse((ROOT / "site").exists())
+        self.assertFalse((ROOT / "integration").exists())
 
     def test_public_work_has_no_named_commercial_research_reference(self):
         terms = ("i" + "bm", "agile" + "-crypto", "ci" + "tius")
@@ -78,17 +78,17 @@ class RepositoryContractTest(unittest.TestCase):
                     self.assertNotIn(term, content)
 
     def test_openapi_vertical_slice(self):
-        api = json.loads((ROOT / "api/openapi/caap-v1.openapi.json").read_text())
+        api = json.loads((ROOT / "api/openapi/cali-v2.openapi.json").read_text())
         validate(api)
         self.assertEqual(api["openapi"], "3.1.0")
-        self.assertEqual(api["info"]["version"], "0.2.0-draft")
+        self.assertEqual(api["info"]["version"], "2.0.0-draft")
         self.assertEqual(
             set(api["paths"]),
-            {"/healthz", "/v1/capabilities", "/v1/policies:resolve", "/v1/keys", "/v1/keys/{keyRef}", "/v1/sign", "/v1/verify"},
+            {"/healthz", "/v2/capabilities", "/v2/policies:resolve", "/v2/keys", "/v2/keys/{keyRef}", "/v2/sign", "/v2/verify"},
         )
 
     def test_openapi_operations_are_typed_and_maturity_labelled(self):
-        api = json.loads((ROOT / "api/openapi/caap-v1.openapi.json").read_text())
+        api = json.loads((ROOT / "api/openapi/cali-v2.openapi.json").read_text())
         expected = {
             "resolvePolicy": "ResolvePolicyRequest",
             "createKey": "CreateKeyRequest",
@@ -99,7 +99,7 @@ class RepositoryContractTest(unittest.TestCase):
             for method, operation in path_item.items():
                 if method not in {"get", "post"}:
                     continue
-                self.assertEqual(operation["x-caap-maturity"], "implemented")
+                self.assertEqual(operation["x-cali-maturity"], "implemented")
                 operation_id = operation["operationId"]
                 if operation_id in expected:
                     reference = operation["requestBody"]["$ref"]
@@ -108,7 +108,7 @@ class RepositoryContractTest(unittest.TestCase):
         self.assertTrue({"POLICY_AMBIGUOUS", "CAPABILITY_MISMATCH", "IDEMPOTENCY_CONFLICT", "AUTHENTICATION_FAILED"} <= categories)
 
     def test_openapi_internal_references_resolve(self):
-        api = json.loads((ROOT / "api/openapi/caap-v1.openapi.json").read_text())
+        api = json.loads((ROOT / "api/openapi/cali-v2.openapi.json").read_text())
 
         def walk(value):
             if isinstance(value, dict):
@@ -150,30 +150,8 @@ class RepositoryContractTest(unittest.TestCase):
         self.assertFalse((ROOT / "public-export").exists())
         self.assertFalse((ROOT / "common-crypto-api-spec-draft-v0.1.md").exists())
 
-    def test_site_security_deterrent_is_disabled(self):
-        config = (ROOT / "site/config.js").read_text(encoding="utf-8")
-        self.assertRegex(config, r"contentProtectionEnabled:\s*false")
-
-    def test_site_has_one_main_and_local_assets(self):
-        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
-        self.assertEqual(html.count("<main"), 1)
-        self.assertEqual(html.count("</main>"), 1)
-        for asset in ("styles.css", "config.js", "app.js"):
-            self.assertTrue((ROOT / "site" / asset).is_file())
-            self.assertIn(asset, html)
-        for section_id in ("problem", "precedent", "definition", "architecture", "how-it-works", "pillars", "maturity", "why-now", "limits", "implementation"):
-            self.assertIn(f'id="{section_id}"', html)
-        self.assertNotIn('id="roadmap"', html)
-        self.assertNotIn("<img", html)
-        self.assertGreaterEqual(html.count('data-architecture-title='), 11)
-        self.assertIn('class="architecture-detail" aria-live="polite"', html)
-        self.assertIn("Ganesh Mallaya Cybersecurity Blogs", html)
-        self.assertIn('rel="canonical" href="https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/"', html)
-        self.assertTrue((ROOT / "site/assets/favicon.svg").is_file())
-        self.assertIn("assets/favicon.svg", html)
-
     def test_independent_development_disclaimer_is_public(self):
-        for relative in ("README.md", "NOTICE.md", "site/index.html"):
+        for relative in ("README.md", "NOTICE.md"):
             text = (ROOT / relative).read_text(encoding="utf-8")
             self.assertIn("no affiliation with", text)
 

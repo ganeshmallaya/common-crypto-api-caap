@@ -12,7 +12,7 @@ from referencing.jsonschema import DRAFT202012
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "reference"))
 
-from caap_reference.broker import API_VERSION, Broker, CaapError, POLICY, RECOGNIZED_EXECUTION_OPERATIONS  # noqa: E402
+from cali_reference.broker import API_VERSION, Broker, CaliError, POLICY, RECOGNIZED_EXECUTION_OPERATIONS  # noqa: E402
 
 
 def request(operation, input_data, request_id="test-request-0001", constraints=None):
@@ -37,10 +37,10 @@ class BrokerTest(unittest.TestCase):
         return response["result"]["keyRef"]
 
     def assert_openapi_schema(self, name, value):
-        api = __import__("json").loads((ROOT / "api/openapi/caap-v1.openapi.json").read_text())
+        api = __import__("json").loads((ROOT / "api/openapi/cali-v2.openapi.json").read_text())
         resource = Resource.from_contents(api, default_specification=DRAFT202012)
-        registry = Registry().with_resource("urn:caap:openapi", resource)
-        schema = {"$ref": f"urn:caap:openapi#/components/schemas/{name}"}
+        registry = Registry().with_resource("urn:cali:openapi", resource)
+        schema = {"$ref": f"urn:cali:openapi#/components/schemas/{name}"}
         Draft202012Validator(schema, registry=registry, format_checker=FormatChecker()).validate(value)
 
     def test_create_sign_verify(self):
@@ -62,45 +62,45 @@ class BrokerTest(unittest.TestCase):
 
     def test_key_reference_is_tenant_bound(self):
         key_ref = self.create_key()
-        with self.assertRaises(CaapError) as raised:
+        with self.assertRaises(CaliError) as raised:
             self.broker.read_key(key_ref, "tenant-b")
         self.assertEqual(raised.exception.category, "KEY_STATE_INVALID")
 
     def test_provider_constraint_fails_closed(self):
-        with self.assertRaises(CaapError) as raised:
+        with self.assertRaises(CaliError) as raised:
             self.broker.execute(request("ResolvePolicy", {}, constraints={"profile": "artifact-signing-v0", "providerClasses": ["hsm"]}), "tenant-a")
         self.assertEqual(raised.exception.category, "CAPABILITY_MISMATCH")
 
     def test_policy_version_is_pinned(self):
         value = request("ResolvePolicy", {})
         value["expectedPolicy"] = {"profileId": "baseline-artifact-signing", "profileVersion": "0"}
-        with self.assertRaises(CaapError) as raised:
+        with self.assertRaises(CaliError) as raised:
             self.broker.execute(value, "tenant-a")
         self.assertEqual(raised.exception.category, "POLICY_INACTIVE")
 
     def test_unknown_fields_are_rejected(self):
         value = request("ResolvePolicy", {})
         value["algorithm"] = "choose-for-me"
-        with self.assertRaises(CaapError) as raised:
+        with self.assertRaises(CaliError) as raised:
             self.broker.execute(value, "tenant-a")
         self.assertEqual(raised.exception.category, "INVALID_REQUEST")
 
     def test_known_unimplemented_and_unknown_operations_differ(self):
         known = request("Encrypt", {"keyRef": "key_unavailable", "plaintext": "YQ"})
-        with self.assertRaises(CaapError) as raised:
+        with self.assertRaises(CaliError) as raised:
             self.broker.execute(known, "tenant-a")
         self.assertEqual(raised.exception.category, "NOT_IMPLEMENTED")
         self.assertEqual(raised.exception.status, 501)
 
         unknown = request("DoSomethingCryptographic", {})
-        with self.assertRaises(CaapError) as raised:
+        with self.assertRaises(CaliError) as raised:
             self.broker.execute(unknown, "tenant-a")
         self.assertEqual(raised.exception.category, "INVALID_REQUEST")
 
     def test_rejected_request_records_non_secret_failure_evidence(self):
         value = request("ResolvePolicy", {})
         value["expectedPolicy"] = {"profileId": "baseline-artifact-signing", "profileVersion": "old"}
-        with self.assertRaises(CaapError):
+        with self.assertRaises(CaliError):
             self.broker.execute(value, "tenant-a")
         event = self.broker.audit_events[-1]
         self.assertEqual(event["outcome"], "failure")
@@ -109,7 +109,7 @@ class BrokerTest(unittest.TestCase):
 
     def test_padded_base64_is_rejected(self):
         key_ref = self.create_key()
-        with self.assertRaises(CaapError) as raised:
+        with self.assertRaises(CaliError) as raised:
             self.broker.execute(request("Sign", {"keyRef": key_ref, "message": "YQ=="}, "test-request-0002"), "tenant-a")
         self.assertEqual(raised.exception.category, "INVALID_REQUEST")
 
@@ -144,7 +144,7 @@ class BrokerTest(unittest.TestCase):
 
         try:
             self.broker.execute(request("UnknownOperation", {}), "tenant-a")
-        except CaapError as error:
+        except CaliError as error:
             self.assert_openapi_schema("ErrorEnvelope", error.response())
 
 

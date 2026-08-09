@@ -1,119 +1,45 @@
-# Serve the repository site at the canonical personal-site URL
+# Native personal-site integration
 
-The canonical public URL is fixed:
+The canonical public route is:
 
 <https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/>
 
-The content source is `site/` in this repository. GitHub Pages is the origin;
-Vercel preserves the canonical `ganeshmallaya.com` address by rewriting that
-path to the Pages origin. A rewrite keeps the browser URL unchanged. This avoids
-copying CAAP articles, data, or components into `personal-site`.
+The personal site renders CALI explanatory pages natively using its shared
+Astro header, footer, accessibility behavior, search, responsive layout, and
+left-side page navigation. It does not proxy GitHub Pages and does not fetch
+repository files at runtime.
 
-```text
-common-crypto-api-caap/main/site/
-                | manual GitHub Pages deployment
-                v
-ganeshmallaya.github.io/common-crypto-api-caap/
-                | Vercel external-origin rewrite
-                v
-ganeshmallaya.com/research/crypto-agility-algorithm-protocol/
-```
+## Authority boundary
 
-The static page declares the `ganeshmallaya.com` URL as its canonical URL. The
-GitHub Pages URL is an implementation origin, not the public identity.
+This repository remains authoritative for the candidate specification, schemas,
+OpenAPI document, machine-readable registry and profiles, examples, reference
+service, tests, and roadmap. Each native research page ends with a direct link
+to the corresponding repository artifact.
 
-## Personal-site changes
+The personal-site copy explains those artifacts for engineers. When a protocol
+shape changes, update the authoritative artifact first, then update the native
+page and both repositories' tests in the same reviewed release.
 
-In `personal-site/vercel.json`, merge the two legacy-route redirects into the
-existing `redirects` array and add the rewrite array. Keep the exact rewrite
-first and the wildcard second:
+## Native route map
 
-```json
-{
-  "redirects": [
-    {
-      "source": "/research",
-      "destination": "/research/crypto-agility-algorithm-protocol/",
-      "permanent": true
-    },
-    {
-      "source": "/research/crypto-agility-algorithm-protocol/protocol",
-      "destination": "/research/crypto-agility-algorithm-protocol/",
-      "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/research/crypto-agility-algorithm-protocol",
-      "destination": "https://ganeshmallaya.github.io/common-crypto-api-caap/"
-    },
-    {
-      "source": "/research/crypto-agility-algorithm-protocol/:path*",
-      "destination": "https://ganeshmallaya.github.io/common-crypto-api-caap/:path*"
-    }
-  ]
-}
-```
+| Public page | Repository source |
+| --- | --- |
+| `/research/crypto-agility-algorithm-protocol/` | `README.md` |
+| `/specification/` | `spec/cali-v2.md` |
+| `/operations/` | `spec/operation-contracts.md` |
+| `/operation-catalog/` | `api/operation-registry.json` |
+| `/algorithm-profile/` | `api/profiles/pqc-signing-v2.profile.json` |
+| `/openapi/` | `api/openapi/cali-v2.openapi.json` |
+| `/run-service/` | `reference/README.md` |
+| `/implementation/` | `examples/README.md` |
+| `/roadmap/` | `ROADMAP.md` |
+| `/nist-alignment/` | `docs/nist-cswp-39-alignment.md` |
+| `/security/` | `docs/security-considerations.md` |
 
-The wildcard rewrite is essential: relative requests for `styles.css`, scripts, and
-SVGs arrive below the canonical path and must be forwarded to the matching Pages
-asset. Vercel documents this as an external-origin rewrite, which serves external
-content while retaining the requested URL.
+Every child path above is relative to the canonical research route.
 
-Set the Research navigation target in `src/components/Header.astro` to:
+## Publication gate
 
-```ts
-[
-  'https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/',
-  'Research',
-],
-```
-
-Remove the duplicated CAAP route implementation, research index, copied data,
-sync tooling, and presentation-only protection component after confirming no
-other code imports them. The audit of personal-site commit `8f91e02` identified
-these migration candidates:
-
-```text
-src/pages/research/crypto-agility-algorithm-protocol/index.astro
-src/pages/research/crypto-agility-algorithm-protocol/protocol/index.astro
-src/pages/research/index.astro
-src/data/research/caap/
-src/components/research/CaapTabs.astro
-src/components/research/ResearchProtection.astro
-scripts/sync-caap-export.mjs
-scripts/sync-caap-export.test.mjs
-```
-
-CAAP is currently the sole Research destination, so `/research` redirects to
-the canonical CAAP route. The lightweight record in
-`src/pages/search-index.json.ts` points to that canonical URL and contains no
-copied specification body. The content-deterrent code is retained, disabled,
-in the authoritative repository site rather than duplicated here.
-
-The prior personal-site content used operation names and scope that differ from
-the current candidate contract. The repository specification, OpenAPI document,
-schemas, examples, and `site/` are now the authoritative working set. See
-[`personal-site-content-reconciliation.md`](personal-site-content-reconciliation.md).
-
-## Controlled release order
-
-1. Review, commit, and push this repository.
-2. Select **GitHub Actions** as the repository's Pages source.
-3. Manually run `Deploy research site to Pages` and verify the Pages origin.
-4. In the personal-site checkout, merge the two redirects and two rewrite
-   rules, then change the Research navigation target.
-5. Remove the duplicated CAAP files and sync tooling after checking their
-   callers, then replace copied-route assertions with rewrite/link assertions.
-6. Run `npm run format:check && npm run lint && npm test` in personal-site.
-7. Preview the exact canonical route and verify desktop, mobile, styles,
-   scripts, repository links, and the permanent nested `/protocol/` redirect.
-8. Commit, push, and deploy the personal-site change only after review.
-
-Vercel's current rewrite documentation is the configuration authority:
-<https://vercel.com/docs/routing/rewrites#rewrites-to-external-origins>.
-
-## Rollback
-
-Remove the two redirects and two rewrites, then restore the Research navigation
-to `/research/` and restore the old pages from Git history.
+Keep changes local until the maintainer approves commit and deployment. Validate
+this repository with `python3 -m unittest discover -s tests -v` and validate the
+personal site with its formatting, lint, build, link, and Playwright gates.

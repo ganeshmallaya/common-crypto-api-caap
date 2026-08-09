@@ -18,10 +18,10 @@ dependencies.
 
 ## Research hypothesis
 
-CAAP explores whether a stable Common Crypto API can accept an operation intent
+CALI explores whether a stable Common Crypto API can accept an operation intent
 and resolve it through versioned policy to an allowed algorithm and provider.
 The provider might be a software library, HSM, KMS, or key store. A certificate
-authority can use the API as part of an issuance workflow without CAAP taking
+authority can use the API as part of an issuance workflow without CALI taking
 over certificate lifecycle semantics.
 
 A successful abstraction would make supported transitions policy-led while
@@ -32,7 +32,7 @@ The central research object is the abstraction layer itself: the consumer
 contract, provider contract, policy-decision boundary, broker enforcement
 behavior, and evidence required for two implementations to behave consistently.
 Inventory, migration orchestration, and certificate lifecycle systems may use
-that layer, but they are not the CAAP thesis.
+that layer, but they are not the CALI thesis.
 
 ## Goals
 

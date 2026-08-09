@@ -2,7 +2,7 @@
 
 Status: working research draft
 
-CAAP centralizes a high-impact decision: which cryptographic mechanism and
+CALI centralizes a high-impact decision: which cryptographic mechanism and
 provider will act for a caller. Centralization can improve visibility and
 control, but it also concentrates policy, identity, routing, and availability
 risk. A stable API is not itself a security boundary.
@@ -56,7 +56,7 @@ vectors.
 
 ## Combined constructions
 
-CAAP must not create a combined construction by merely running two algorithms
+CALI must not create a combined construction by merely running two algorithms
 and concatenating outputs. Composition, combiner behavior, validation,
 encoding, failure handling, and security properties require an external or
 separately reviewed definition. Until then, combined-operation examples are
@@ -98,10 +98,10 @@ one interpretation; it does not prove that the design or cryptography is safe.
 ## Research-site publication
 
 Research drafts may discuss unresolved weaknesses and must not become public by
-accident. The static site under `site/` is the only deployable web content.
-Enabling Pages, changing a custom domain or DNS, and linking it from the personal
-site remain separate approval gates. Client-side copy deterrents are not access
-control and are disabled by default.
+accident. Native personal-site research pages are reviewed separately and link
+back to the authoritative repository artifact for each topic. Publication and
+production deployment remain explicit approval gates. Client-side copy
+deterrents are not access control and remain disabled.
 
 ## Unresolved security decisions
 

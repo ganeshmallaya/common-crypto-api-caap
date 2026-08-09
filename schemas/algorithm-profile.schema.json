@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ganeshmallaya.github.io/common-crypto-api-caap/schemas/algorithm-profile.schema.json",
-  "title": "CAAP experimental algorithm profile",
+  "$id": "https://raw.githubusercontent.com/ganeshmallaya/common-crypto-api-caap/main/schemas/algorithm-profile.schema.json",
+  "title": "CALI experimental algorithm profile",
   "type": "object",
   "additionalProperties": false,
   "required": ["$schema", "schemaVersion", "profileId", "profileVersion", "status", "family", "operations", "input", "output", "algorithms", "keyRequirements", "securityNotes", "references"],
   "properties": {
     "$schema": {"type": "string"},
-    "schemaVersion": {"const": "0.2.0-draft"},
+    "schemaVersion": {"const": "2.0.0-draft"},
     "profileId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{2,127}$"},
     "profileVersion": {"type": "string", "minLength": 1, "maxLength": 64},
     "status": {"enum": ["experimental", "candidate", "withdrawn"]},

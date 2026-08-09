@@ -1,0 +1,49 @@
+{
+  "$schema": "../../schemas/algorithm-profile.schema.json",
+  "schemaVersion": "2.0.0-draft",
+  "profileId": "pqc-signing-v2",
+  "profileVersion": "2",
+  "status": "candidate",
+  "family": "signature",
+  "operations": ["CreateKey", "Sign", "Verify", "TransformKey"],
+  "input": {
+    "interpretation": "message-bytes-signed-exactly-once",
+    "encoding": "base64-unpadded",
+    "emptyAllowed": false
+  },
+  "output": {"type": "signature", "encoding": "base64-unpadded"},
+  "algorithms": [
+    {
+      "identifier": "urn:cali:algorithm:rsa-pss-sha256",
+      "status": "specified",
+      "references": ["https://www.rfc-editor.org/rfc/rfc8017"]
+    },
+    {
+      "identifier": "urn:cali:algorithm:ecdsa-p256-sha256",
+      "status": "specified",
+      "references": ["https://www.rfc-editor.org/rfc/rfc5758"]
+    },
+    {
+      "identifier": "urn:cali:algorithm:ml-dsa-65",
+      "status": "specified",
+      "references": ["https://csrc.nist.gov/pubs/fips/204/final"]
+    }
+  ],
+  "keyRequirements": {
+    "purpose": "sign",
+    "privateMaterialReturned": false,
+    "opaqueReference": true,
+    "states": ["active", "verify-only"]
+  },
+  "securityNotes": [
+    "TransformKey creates new ML-DSA key material; it does not convert an ECC private key.",
+    "An overlap profile may permit ECDSA verification while requiring ML-DSA signing.",
+    "The current minimal software provider does not execute these candidate algorithms.",
+    "Silent fallback between classical and post-quantum algorithms is forbidden."
+  ],
+  "references": [
+    "https://www.rfc-editor.org/rfc/rfc8017",
+    "https://www.rfc-editor.org/rfc/rfc5758",
+    "https://csrc.nist.gov/pubs/fips/204/final"
+  ]
+}

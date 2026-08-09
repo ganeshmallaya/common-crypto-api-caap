@@ -3,9 +3,9 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "caap-reference"
-version = "0.2.0.dev0"
-description = "Research reference implementation of the CAAP Common Crypto API"
+name = "cali-reference"
+version = "2.0.0.dev0"
+description = "Research reference implementation of the CALI Common Crypto API"
 requires-python = ">=3.11"
 dependencies = ["cryptography>=43"]
 
@@ -16,7 +16,7 @@ dev = [
 ]
 
 [project.scripts]
-caap-reference = "caap_reference.server:main"
+cali-reference = "cali_reference.server:main"
 
 [tool.setuptools]
 package-dir = {"" = "reference"}

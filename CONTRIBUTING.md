@@ -1,6 +1,6 @@
 # Research feedback and contributions
 
-CAAP is publicly viewable proprietary research by Ganesh Mallaya. Copyright is
+CALI is publicly viewable proprietary research by Ganesh Mallaya. Copyright is
 reserved and no open-source or contribution license has been granted.
 
 ## Feedback

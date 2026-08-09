@@ -20,5 +20,3 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: python -m unittest discover -s tests -v
       - run: sh -n examples/quickstart.sh
-      - run: node --check site/config.js
-      - run: node --check site/app.js

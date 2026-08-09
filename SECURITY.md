@@ -1,6 +1,6 @@
 # Security policy
 
-CAAP and the included service are exploratory research, not production-ready
+CALI and the included service are exploratory research, not production-ready
 cryptographic software. Do not expose the reference server to untrusted networks
 or use it to protect production data or keys.
 

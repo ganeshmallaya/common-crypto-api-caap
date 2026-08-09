@@ -7,8 +7,8 @@ definitions in external standards.
 
 | Term | Working definition |
 | --- | --- |
-| **CAAP** | Crypto Agility Algorithm Protocol, the research specification for policy-controlled cryptographic operation selection and dispatch. |
-| **Common Crypto API** | The consumer-facing interface defined by CAAP. |
+| **CALI** | Cryptographic Abstraction Layer Interface, the research specification for policy-controlled cryptographic operation selection and dispatch. |
+| **Common Crypto API** | The consumer-facing interface defined by CALI. |
 | **Consumer** | An application or service that requests a cryptographic operation. |
 | **Intent** | A stable, application-level purpose such as `artifact-signing`; it is not an algorithm name. |
 | **Operation** | A requested action such as capability discovery, key generation, signing, verification, encapsulation, or decapsulation. |
@@ -18,16 +18,16 @@ definitions in external standards.
 | **Provider** | An adapter that performs operations through a software library, HSM, KMS, key store, or another cryptographic backend. |
 | **Provider interface** | The southbound contract a provider adapter implements. |
 | **Capability descriptor** | An authenticated, scoped description of operations and identifiers a provider can support. It is not proof that a particular request is authorized. |
-| **Algorithm identifier** | An identifier interpreted within an explicitly named registry or namespace. CAAP should reuse established identifiers where applicable. |
+| **Algorithm identifier** | An identifier interpreted within an explicitly named registry or namespace. CALI should reuse established identifiers where applicable. |
 | **Combined algorithm** | A reviewed construction that uses more than one primitive with defined composition and encoding. “Hybrid” and “composite” are not treated as interchangeable without a cited definition. |
 | **Key reference** | An opaque identifier for key material and its relevant metadata; it is not the key material itself. |
 | **Caller context** | Authenticated identity, tenant, workload, purpose, environment, and other inputs used for authorization and policy. |
 | **Minimum constraints** | Caller- or policy-supplied requirements that cannot be weakened during resolution. |
-| **CA integration** | The boundary where a certificate authority or certificate workflow consumes cryptographic operations. CAAP does not define issuance or revocation semantics. |
+| **CA integration** | The boundary where a certificate authority or certificate workflow consumes cryptographic operations. CALI does not define issuance or revocation semantics. |
 | **HSM** | Hardware security module. Product-specific capability is not implied. |
 | **KMS** | Key management service. Product-specific capability is not implied. |
 | **Key store** | A system that retains keys or key references and enforces access or lifecycle controls. |
-| **Research site** | Static content in `site/`, deployed from this repository only after explicit approval. |
+| **Research site** | Native personal-site pages that explain reviewed CALI artifacts and link to their authoritative repository sources. |
 
 ## Normative language
 

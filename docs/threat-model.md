@@ -4,7 +4,7 @@ Status: initial research threat model
 
 ## Scope
 
-This model covers the CAAP consumer, broker, policy path, provider adapter,
+This model covers the CALI consumer, broker, policy path, provider adapter,
 cryptographic backend, and research-site publication boundary. It does not prove
 that a particular deployment is secure.
 
@@ -48,20 +48,20 @@ that a particular deployment is secure.
 | Secret leakage | Runtime and observability | No secrets in logs, protected secret delivery, memory handling, least privilege, redaction tests |
 | Denial of service | Network, broker, provider | Admission control, quotas, bounded work, timeouts, circuit breakers, capacity isolation |
 | Audit deletion or forgery | Broker and audit sink | Restricted write path, integrity protection, secure time, retention, independent monitoring |
-| Unreviewed website publication | Repository and website | `site/` allowlist, protected branch, manual Pages workflow, explicit approval, no runtime fetch |
+| Unreviewed website publication | Repository and website | protected branches, native-page review, explicit approval, and authoritative source links |
 
 ## Important abuse cases
 
 ### Ambiguous policy
 
 An attacker or configuration error creates overlapping rules. The broker chooses
-one based on ordering that the consumer cannot see. CAAP must reject unresolved
+one based on ordering that the consumer cannot see. CALI must reject unresolved
 ambiguity rather than treating rule order as an undocumented security control.
 
 ### Weaker but available provider
 
 The intended provider is unavailable while a weaker or differently protected
-provider remains online. Availability pressure causes automatic fallback. CAAP
+provider remains online. Availability pressure causes automatic fallback. CALI
 must reject the operation unless an explicit active policy authorizes the exact
 alternative while still meeting minimum constraints.
 
@@ -80,8 +80,8 @@ tenant authorization independent of identifier possession.
 ### Draft publication
 
 A website job publishes research text from an unreviewed branch or working tree.
-The public boundary needs a protected source branch, allowlisted `site/` path,
-manual deployment, recorded source commit, and explicit approval.
+The public boundary needs protected source branches, reviewed native pages,
+recorded source commits, authoritative repository links, and explicit approval.
 
 ## Out of scope for this version
 

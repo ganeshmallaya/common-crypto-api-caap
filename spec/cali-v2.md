@@ -1,18 +1,18 @@
-# Crypto Agility Algorithm Protocol — candidate v1
+# Cryptographic Abstraction Layer Interface — candidate v2
 
-Status: exploratory specification, version `0.2.0-draft`
+Status: exploratory specification, version `2.0.0-draft`
 
 The key words **MUST**, **MUST NOT**, **SHOULD**, and **MAY** express candidate
 requirements for experimentation. They do not imply standards-track status.
 
 ## 1. Scope
 
-CAAP defines the decisions and evidence that a Common Crypto API implementation
+CALI defines the decisions and evidence that a Common Crypto API implementation
 preserves between an authenticated consumer, policy authority, broker, and
 provider. A transport binding may be HTTP, gRPC, an in-process interface, or a
 local IPC mechanism, provided it preserves the same semantics.
 
-CAAP does not define cryptographic algorithms and does not replace PKCS#11,
+CALI does not define cryptographic algorithms and does not replace PKCS#11,
 KMIP, KMS APIs, JCA, OpenSSL, certificate authorities, ACME, CMP, EST, TLS, or
 application protocol negotiation.
 
@@ -174,5 +174,5 @@ change classification.
 
 An implementation MUST identify the exact profiles and binding versions it
 implements. Repository tests currently establish only behavior of the included
-reference slice. CAAP conformance is undefined until the black-box runner,
+reference slice. CALI conformance is undefined until the black-box runner,
 positive and negative vectors, and conformance policy are published.

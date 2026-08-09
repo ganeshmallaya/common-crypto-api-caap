@@ -1,6 +1,6 @@
 # Experimental schemas
 
-These JSON Schema 2020-12 documents support the `0.2.0-draft` research slice.
+These JSON Schema 2020-12 documents support the `2.0.0-draft` research slice.
 The OpenAPI document is the candidate HTTP binding; the prose specification
 controls when a schema cannot express a semantic requirement.
 

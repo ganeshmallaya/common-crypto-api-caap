@@ -6,11 +6,11 @@ repository; **specified** has candidate contract text but no complete backend;
 
 ## Milestone 0 — repository foundation (implemented)
 
-- Canonical CAAP/Common Crypto API naming and trust boundaries.
+- Canonical CALI/Common Crypto API naming and trust boundaries.
 - Candidate HTTP/OpenAPI binding and JSON Schemas.
 - Minimal in-memory broker, software provider, pinned policy resolution, and
   explicit error model.
-- Repo-hosted static research page and CI/Pages workflows.
+- Native personal-site research pages with repository source references.
 
 ## Milestone 1 — artifact-signing profile (implemented research slice)
 
@@ -23,6 +23,11 @@ repository; **specified** has candidate contract text but no complete backend;
 
 ## Milestone 2 — primitive coverage (specified, implementation planned)
 
+The v2 algorithm examples prioritize RSA-PSS, ECDSA P-256, ML-DSA-65, and a
+staged ECC-to-ML-DSA transition. They are specified profiles until provider
+execution paths and vectors are checked in; the current executable slice
+remains Ed25519.
+
 In order: digest and random; MAC; authenticated encrypt/decrypt; key derivation;
 key agreement; encapsulation/decapsulation; key wrap/unwrap; then carefully
 bounded streaming forms. Each primitive requires typed inputs, output encoding,
@@ -30,7 +35,7 @@ retry/idempotency rules, negative vectors, and provider-equivalence tests.
 
 Algorithm coverage expands only inside a stable operation profile. Combined or
 hybrid cryptography requires a separately reviewed construction; concatenating
-two outputs is not a CAAP construction.
+two outputs is not a CALI construction.
 
 ## Milestone 3 — lifecycle and migration (specified, implementation planned)
 

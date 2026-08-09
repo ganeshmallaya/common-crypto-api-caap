@@ -11,11 +11,11 @@ not a security-reviewed signing service.
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e '.[dev]'
-python -m caap_reference
+python -m cali_reference
 ```
 
 Defaults: `127.0.0.1:8080`, in-memory keys, software provider, and development
-authentication disabled. Set `CAAP_AUTH_TOKEN` to require
+authentication disabled. Set `CALI_AUTH_TOKEN` to require
 `Authorization: Bearer <token>`. Never expose the development server publicly.
 
 The process deliberately has no persistent private-key storage, TLS termination,
@@ -26,7 +26,7 @@ may repeat the operation. Restarting destroys all keys.
 ## Implemented flow
 
 1. Validate the request envelope and operation.
-2. Establish a development tenant from `X-CAAP-Tenant` (default `local-dev`).
+2. Establish a development tenant from `X-CALI-Tenant` (default `local-dev`).
 3. Resolve and pin the built-in active policy.
 4. Compare caller minimum constraints.
 5. match the software provider's scoped capability;

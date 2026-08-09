@@ -1,18 +1,18 @@
 # Alignment with NIST CSWP 39upd1
 
-CAAP is proprietary Ganesh Mallaya research informed by
+CALI is proprietary Ganesh Mallaya research informed by
 [NIST CSWP 39upd1, *Considerations for Achieving Crypto Agility: Strategies and Practices*](https://doi.org/10.6028/NIST.CSWP.39-upd1),
 finalized with updates on 2026-06-29. NIST defines crypto agility broadly as the
 capabilities needed to replace and adapt algorithms across protocols,
 applications, software, hardware, firmware, and infrastructure while preserving
 security and ongoing operations.
 
-This document records design alignment only. CAAP is not a NIST publication,
+This document records design alignment only. CALI is not a NIST publication,
 standard, profile, endorsement, or conformance claim.
 
-## How CAAP turns the guidance into a research contract
+## How CALI turns the guidance into a research contract
 
-| NIST CSWP 39upd1 theme | CAAP response |
+| NIST CSWP 39upd1 theme | CALI response |
 | --- | --- |
 | Transitions must preserve security and operations. | The broker fails closed on ambiguity, downgrade, expired policy, incompatible capability, and invalid key state. |
 | Agility spans applications and infrastructure. | The Common Crypto API separates consumer intent from provider adapters while retaining explicit trust boundaries. |
@@ -23,12 +23,12 @@ standard, profile, endorsement, or conformance claim.
 
 ## Boundaries
 
-NIST CSWP 39upd1 is guidance, not an API specification. CAAP supplies one
+NIST CSWP 39upd1 is guidance, not an API specification. CALI supplies one
 candidate technical model and reference slice. It does not imply that a policy
 change alone can update protocols, peer systems, certificate chains, stored
 data, fixed-function devices, or every application without coordinated change.
 
 ## Review rule
 
-Future CAAP claims should cite the current NIST revision, distinguish guidance
-from CAAP-specific design choices, and label unimplemented work clearly.
+Future CALI claims should cite the current NIST revision, distinguish guidance
+from CALI-specific design choices, and label unimplemented work clearly.

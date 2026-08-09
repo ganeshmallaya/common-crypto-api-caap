@@ -7,16 +7,17 @@ These instructions apply to the entire repository.
 - This is independently owned, vendor-neutral research by Ganesh Mallaya. It may
   be publicly viewable while remaining all-rights-reserved unless a license is
   deliberately added.
-- **Crypto Agility Algorithm Protocol (CAAP)** is the canonical name of the
-  research specification.
-- **Common Crypto API** is the implementation/interface defined by CAAP.
+- **Cryptographic Abstraction Layer Interface (CALI)** is the canonical name of
+  the research specification and interface moving forward.
+- **Common Crypto API** may describe the interface category, but CALI is the
+  project name.
 - `common-crypto-api-caap` is the repository name; do not infer a different
-  expansion of CAAP from it.
+  expansion of CALI from it.
 
 ## Authority and status
 
 - Treat `docs/`, `schemas/`, and `examples/` as working research material.
-- Treat `spec/caap-v1.md` as the current candidate specification and the OpenAPI
+- Treat `spec/cali-v2.md` as the current candidate specification and the OpenAPI
   document as its experimental HTTP binding.
 - Do not invent standards status, affiliations, adoption, interoperability,
   conformance, product capabilities, implementation results, benchmarks, or
@@ -32,7 +33,7 @@ These instructions apply to the entire repository.
 
 - Separate consumer, broker, policy, provider, and certificate-authority trust
   boundaries.
-- Do not imply that CAAP replaces PKCS#11, KMS APIs, CA protocols, or existing
+- Do not imply that CALI replaces PKCS#11, KMS APIs, CA protocols, or existing
   cryptographic standards.
 - Require explicit failure for ambiguity, downgrade, policy expiry, and
   capability mismatch. Never specify silent algorithm fallback.
@@ -43,11 +44,12 @@ These instructions apply to the entire repository.
 
 ## Research-site publication gate
 
-- The research repository is authoritative and `site/` is the deployable static
-  research site.
-- The canonical personal-site route may use the reviewed external-origin
-  rewrite to the repository Pages deployment; do not duplicate CAAP content or
-  fetch repository files in application code.
+- The research repository is authoritative for specification and implementation
+  artifacts. The personal site renders reviewed explanatory copies natively and
+  links each page to its repository source.
+- Do not restore the GitHub Pages proxy or Vercel rewrite. The canonical route is
+  rendered by `personal-site` so its header, navigation, accessibility, and
+  deployment behavior match the rest of ganeshmallaya.com.
 - Publication still requires explicit user approval. Do not enable GitHub Pages,
   configure a custom domain, alter DNS, or update the personal-site repository
   without that approval.

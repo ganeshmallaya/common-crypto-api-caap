@@ -1,6 +1,6 @@
-# CAAP operation contracts — candidate 0.2.0
+# CALI operation contracts — candidate 2.0.0
 
-Status: exploratory companion to [`caap-v1.md`](caap-v1.md).
+Status: exploratory companion to [`cali-v2.md`](cali-v2.md).
 
 This document defines the operation shapes that a Common Crypto API binding
 must preserve. It is intentionally algorithm-independent. An algorithm profile
@@ -217,7 +217,7 @@ invalid shared secrets are handled.
 A hybrid or composite establishment profile must define the complete reviewed
 construction: component algorithms and parameters, input validation, combiner,
 domain separation, byte encoding, partial failure, downgrade behavior, and
-security assumptions. Concatenation is not a default CAAP combiner.
+security assumptions. Concatenation is not a default CALI combiner.
 
 ## 9. Streaming operations
 
@@ -286,14 +286,14 @@ independent implementation evidence exist.
 
 ## 13. Provider adapter contract
 
-Provider adapters translate the resolved CAAP operation into a backend-native
+Provider adapters translate the resolved CALI operation into a backend-native
 operation; they do not reinterpret policy. Every adapter MUST:
 
 - publish authenticated, freshness-bounded capabilities;
 - identify the exact mechanism, algorithm, parameters, key properties, and
   provider instance used;
 - preserve non-exportability, key purpose, lifecycle state, and tenant binding;
-- map native errors to one stable CAAP category without discarding authorized
+- map native errors to one stable CALI category without discarding authorized
   diagnostic detail;
 - reject unsupported parameters rather than emulate a weaker construction; and
 - report whether a failed mutating operation could have completed.

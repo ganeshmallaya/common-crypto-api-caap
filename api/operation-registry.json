@@ -1,6 +1,6 @@
 {
   "$schema": "../schemas/operation-registry.schema.json",
-  "registryVersion": "0.2.0-draft",
+  "registryVersion": "2.0.0-draft",
   "status": "experimental",
   "operations": [
     {"name": "GetCapabilities", "family": "discovery", "maturity": "implemented", "requestClass": "read", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},

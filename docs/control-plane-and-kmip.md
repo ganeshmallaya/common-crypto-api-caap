@@ -16,7 +16,7 @@ Policy authority / decision point
         |
         | signed, versioned, unambiguous decision
         v
-CAAP broker / enforcement point
+CALI broker / enforcement point
         |
         | concrete operation and constrained provider request
         v
@@ -159,38 +159,38 @@ and certificates. Its profiles cover key lifecycle and cryptographic services,
 including encryption, decryption, signing, and verification. KMIP requests can
 carry concrete cryptographic algorithms and parameters.
 
-CAAP operates one layer above that contract:
+CALI operates one layer above that contract:
 
-| CAAP concept | KMIP relationship |
+| CALI concept | KMIP relationship |
 | --- | --- |
 | Intent, such as `artifact-signing` | Not replaced by a KMIP object name or operation-policy name; resolved before dispatch |
 | Policy decision | Selects the permitted algorithm, parameters, assurance, and provider class |
 | Logical key reference | Broker-owned opaque reference mapped to a KMIP Unique Identifier within an authorized provider context |
 | Capability descriptor | May be populated from KMIP Query, profile, capability, and managed-object information, then scoped and authenticated by the adapter |
-| Key generation and lifecycle | Adapter maps approved CAAP operations to KMIP Create, Create Key Pair, Re-key, Register, Destroy, or related operations when their semantics match |
+| Key generation and lifecycle | Adapter maps approved CALI operations to KMIP Create, Create Key Pair, Re-key, Register, Destroy, or related operations when their semantics match |
 | Cryptographic execution | Adapter maps to KMIP Encrypt, Decrypt, Sign, Signature Verify, MAC, or other supported operations |
-| Provider error | Adapter preserves KMIP result status and reason for operators while mapping it to a stable CAAP error category |
+| Provider error | Adapter preserves KMIP result status and reason for operators while mapping it to a stable CALI error category |
 
 The adapter must not translate by name alone. It must check operation
 semantics, algorithm and parameter identifiers, object state, usage mask,
 extractability, activation dates, tenant authorization, and provider profile.
 
-### What CAAP must not claim about KMIP
+### What CALI must not claim about KMIP
 
-- CAAP does not replace KMIP's managed-object lifecycle or wire protocol.
+- CALI does not replace KMIP's managed-object lifecycle or wire protocol.
 - A KMIP server's support for an operation does not prove the caller is allowed
   to use a particular object.
-- A KMIP Unique Identifier is not automatically a portable CAAP key reference.
+- A KMIP Unique Identifier is not automatically a portable CALI key reference.
 - Re-keying does not mean an asymmetric private key can be mathematically
   converted into a different algorithm. Cross-algorithm migration normally
   creates a successor key and records continuity at the logical-reference or
   application-identity layer.
 - A provider migration may be impossible when the source key is
-  non-extractable. CAAP must return that constraint, not hide it.
+  non-extractable. CALI must return that constraint, not hide it.
 
 ## Recommended implementation split
 
-The open CAAP work should own the northbound and southbound semantics, policy
+The open CALI work should own the northbound and southbound semantics, policy
 decision contract, minimum audit vocabulary, failure behavior, and conformance
 tests. An initial reference implementation should include a small broker and a
 KMIP adapter, but should not become the only valid implementation.

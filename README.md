@@ -1,8 +1,8 @@
-# Crypto Agility Algorithm Protocol (CAAP)
+# Cryptographic Abstraction Layer Interface (CALI)
 
-CAAP is proprietary, vendor-neutral research by **Ganesh Mallaya** for a
+CALI is proprietary, vendor-neutral research by **Ganesh Mallaya** for a
 policy-controlled cryptographic abstraction layer. The **Common Crypto API** is
-the consumer interface defined by CAAP; `common-crypto-api-caap` is this
+the consumer interface defined by CALI; `common-crypto-api-caap` is this
 repository.
 
 Research site: <https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/>
@@ -12,7 +12,7 @@ outcome without hard-coding an algorithm or provider, while the system preserves
 authorization, pinned policy, explicit failures, key custody, and usable audit
 evidence?
 
-> **Research status:** pre-1.0 and not production-ready. This is not a standard,
+> **Research status:** candidate v2.0 and not production-ready. This is not a standard,
 > certification, security assurance, or interoperability claim. The schemas and
 > HTTP binding are candidate contracts until the conformance milestones in the
 > roadmap are met.
@@ -21,16 +21,16 @@ evidence?
 
 | Need | Document or code |
 | --- | --- |
-| Understand the model | [`spec/caap-v1.md`](spec/caap-v1.md) |
+| Understand the model | [`spec/cali-v2.md`](spec/cali-v2.md) |
 | Review every operation family | [`spec/operation-contracts.md`](spec/operation-contracts.md) |
 | Consume the operation catalog | [`api/operation-registry.json`](api/operation-registry.json) |
-| Inspect the implemented profile record | [`api/profiles/artifact-signing-v0.profile.json`](api/profiles/artifact-signing-v0.profile.json) |
-| Use the HTTP contract | [`api/openapi/caap-v1.openapi.json`](api/openapi/caap-v1.openapi.json) |
+| Inspect the v2 classical-to-PQC profile | [`api/profiles/pqc-signing-v2.profile.json`](api/profiles/pqc-signing-v2.profile.json) |
+| Use the HTTP contract | [`api/openapi/cali-v2.openapi.json`](api/openapi/cali-v2.openapi.json) |
 | Run the reference service | [`reference/README.md`](reference/README.md) |
 | See supported versus planned operations | [`ROADMAP.md`](ROADMAP.md) |
 | Review alignment to NIST crypto-agility guidance | [`docs/nist-cswp-39-alignment.md`](docs/nist-cswp-39-alignment.md) |
 | Understand threats and non-goals | [`docs/security-considerations.md`](docs/security-considerations.md) |
-| Host the research page | [`site/README.md`](site/README.md) |
+| Read the native research site | [ganeshmallaya.com research](https://ganeshmallaya.com/research/crypto-agility-algorithm-protocol/) |
 
 ## The two contracts
 
@@ -38,7 +38,7 @@ evidence?
 authenticated consumer
         | Common Crypto API: intent + operation + constraints
         v
-     CAAP broker <---- pinned decision ---- policy authority
+     CALI broker <---- pinned decision ---- policy authority
         |
         | provider contract: resolved operation + opaque key reference
         v
@@ -48,17 +48,19 @@ authenticated consumer
 The broker enforces a policy decision; it does not silently choose a fallback.
 Capability discovery is scoped and is not authorization. Private keys remain
 behind opaque references by default. Existing cryptographic standards and
-provider APIs remain below CAAP rather than being replaced by it.
+provider APIs remain below CALI rather than being replaced by it.
 
 ## What runs today
 
-The Python reference service implements one deliberately small vertical slice:
+The v2 contract and examples concentrate on RSA-PSS, ECDSA P-256, ML-DSA-65,
+and an explicit ECC-to-ML-DSA migration. The Python reference service still
+implements one deliberately small Ed25519 vertical slice:
 
 - scoped capability discovery;
 - pinned policy resolution;
 - Ed25519 key generation using an in-memory software provider;
 - artifact signing and verification;
-- stable CAAP error categories and evidence metadata;
+- stable CALI error categories and evidence metadata;
 - optional development bearer authentication, off by default; and
 - HTTP/JSON endpoints described by the checked-in OpenAPI document.
 
@@ -72,13 +74,13 @@ provider, policy, or key-protection level.
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e '.[dev]'
-python -m caap_reference
+python -m cali_reference
 ```
 
 In another terminal:
 
 ```sh
-curl http://127.0.0.1:8080/v1/capabilities
+curl http://127.0.0.1:8080/v2/capabilities
 ```
 
 The runnable end-to-end example is in [`examples/quickstart.sh`](examples/quickstart.sh).
@@ -95,11 +97,9 @@ python3 -m unittest discover -s tests -v
 api/          candidate HTTP/OpenAPI binding
 docs/         architecture, analysis, security, and governance
 examples/     non-production requests and a runnable flow
-integration/  reviewed cross-repository configuration fragments
 reference/    minimal broker and software provider
 schemas/      experimental JSON Schema contracts
-site/         static research site, deployable from this repository
-spec/         CAAP specification
+spec/         CALI specification
 tests/        contract and reference-implementation tests
 ```
 
@@ -116,8 +116,8 @@ the maintainer deliberately adds one. See [`NOTICE.md`](NOTICE.md).
 
 Research feedback and private vulnerability reporting are described in
 [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md). Approve
-the first release status before public release. CAAP is informed by
+the first release status before public release. CALI is informed by
 [NIST CSWP 39upd1](https://doi.org/10.6028/NIST.CSWP.39-upd1), but is not a NIST
-publication, standard, implementation, endorsement, or conformance claim. CAAP
+publication, standard, implementation, endorsement, or conformance claim. CALI
 is developed independently and has no affiliation with, sponsorship by,
 compatibility claim to, or endorsement from any existing implementation.

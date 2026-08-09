@@ -9,7 +9,7 @@ Consumer or CA workflow
           |
           | Common Crypto API: intent + operation + constraints
           v
-      CAAP broker  <---- authenticated policy ----> Policy authority
+      CALI broker  <---- authenticated policy ----> Policy authority
           |
           | provider operation + resolved choice
           v
@@ -30,7 +30,7 @@ request when the decision, capabilities, or caller constraints do not agree.
 
 ### Consumer
 
-- Authenticates to the CAAP deployment.
+- Authenticates to the CALI deployment.
 - Names an intent and operation.
 - Supplies required context and non-negotiable constraints.
 - Keeps request identifiers stable across safe retries.
@@ -67,7 +67,7 @@ specified, a deployment cannot claim downgrade-resistant policy distribution.
 - Translates provider-interface operations to one backend.
 - Reports scoped capability information.
 - Preserves key protection and authorization properties.
-- Maps provider failures to CAAP error categories without hiding detail needed
+- Maps provider failures to CALI error categories without hiding detail needed
   for operators.
 
 Capability discovery is not authorization and does not guarantee that a later
@@ -76,14 +76,14 @@ operation will succeed.
 A provider adapter may translate the southbound contract to PKCS#11, OASIS
 KMIP, a cloud KMS API, or a software-library API. That translation must preserve
 operation, parameter, object-state, authorization, key-custody, and error
-semantics. CAAP does not replace the underlying provider protocol. See
+semantics. CALI does not replace the underlying provider protocol. See
 [`control-plane-and-kmip.md`](control-plane-and-kmip.md).
 
 ### Certificate authority integration
 
 A CA or certificate management workflow is normally a consumer or orchestrator
-at the north boundary. It can ask CAAP to generate or use a key and to perform a
-signature. CAAP does not decide certificate subject policy, validate an
+at the north boundary. It can ask CALI to generate or use a key and to perform a
+signature. CALI does not decide certificate subject policy, validate an
 enrollment request, issue a certificate, publish revocation state, or replace
 ACME, CMP, EST, or other CA protocols.
 
@@ -98,8 +98,9 @@ ACME, CMP, EST, or other CA protocols.
    integrity.
 4. **Provider to backend:** backend credentials, key custody, mechanism
    translation, session isolation, and lifecycle state.
-5. **Research repository to hosted research site:** reviewed `site/` content,
-   branch protection, build provenance, and explicit publication approval.
+5. **Research repository to hosted research site:** reviewed native explanatory
+   pages, direct authoritative-source links, branch protection, build
+   provenance, and explicit publication approval.
 
 ## Deployment patterns
 
@@ -114,7 +115,7 @@ No pattern is selected as the canonical deployment in this phase.
 
 ## Hard boundaries
 
-- CAAP does not make a backend more secure than its implementation and
+- CALI does not make a backend more secure than its implementation and
   operating controls.
 - A key reference does not prove hardware protection.
 - A capability statement is not a conformance certificate.

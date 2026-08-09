@@ -1,6 +1,6 @@
 {
   "$schema": "../../schemas/algorithm-profile.schema.json",
-  "schemaVersion": "0.2.0-draft",
+  "schemaVersion": "2.0.0-draft",
   "profileId": "artifact-signing-v0",
   "profileVersion": "0",
   "status": "experimental",

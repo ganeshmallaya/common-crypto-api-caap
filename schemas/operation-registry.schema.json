@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ganeshmallaya.github.io/common-crypto-api-caap/schemas/operation-registry.schema.json",
-  "title": "CAAP experimental operation registry",
+  "$id": "https://raw.githubusercontent.com/ganeshmallaya/common-crypto-api-caap/main/schemas/operation-registry.schema.json",
+  "title": "CALI experimental operation registry",
   "type": "object",
   "additionalProperties": false,
   "required": ["$schema", "registryVersion", "status", "operations"],
   "properties": {
     "$schema": {"type": "string"},
-    "registryVersion": {"const": "0.2.0-draft"},
+    "registryVersion": {"const": "2.0.0-draft"},
     "status": {"const": "experimental"},
     "operations": {
       "type": "array",
