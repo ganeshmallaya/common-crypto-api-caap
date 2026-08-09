@@ -1,44 +1,19 @@
 {
   "$schema": "../schemas/policy-profile.schema.json",
-  "schemaVersion": "0.1.0",
-  "profileId": "example-artifact-signing",
-  "profileVersion": "draft-1",
-  "status": "draft",
-  "effectiveAt": null,
+  "schemaVersion": "0.2.0-draft",
+  "profileId": "baseline-artifact-signing",
+  "profileVersion": "1",
+  "status": "active",
+  "effectiveAt": "2026-08-08T00:00:00Z",
   "expiresAt": null,
-  "rules": [
-    {
-      "ruleId": "example-signing-rule",
-      "intent": "artifact-signing",
-      "operations": [
-        "GenerateKeyPair",
-        "Sign",
-        "Verify",
-        "ResolvePolicy"
-      ],
-      "context": {
-        "environment": "example-only"
-      },
-      "decision": {
-        "algorithm": {
-          "namespace": "https://example.invalid/caap/algorithm",
-          "identifier": "signature-example-a",
-          "parameters": {
-            "note": "Unregistered placeholder; not a cryptographic recommendation."
-          }
-        },
-        "providerConstraints": {
-          "allowedProviderClasses": [
-            "software",
-            "hsm",
-            "kms",
-            "key-store"
-          ],
-          "requiredKeyProperties": [
-            "tenant-bound"
-          ]
-        }
-      }
+  "rules": [{
+    "ruleId": "artifact-signing-default",
+    "intent": "artifact-signing",
+    "operations": ["ResolvePolicy", "CreateKey", "Sign", "Verify"],
+    "decision": {
+      "profile": "artifact-signing-v0",
+      "algorithm": "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519",
+      "allowedProviderClasses": ["software"]
     }
-  ]
+  }]
 }

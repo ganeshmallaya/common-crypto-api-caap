@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "caap-reference"
+version = "0.2.0.dev0"
+description = "Research reference implementation of the CAAP Common Crypto API"
+requires-python = ">=3.11"
+dependencies = ["cryptography>=43"]
+
+[project.optional-dependencies]
+dev = [
+  "jsonschema>=4.23,<5",
+  "openapi-spec-validator>=0.9,<1",
+]
+
+[project.scripts]
+caap-reference = "caap_reference.server:main"
+
+[tool.setuptools]
+package-dir = {"" = "reference"}
+
+[tool.setuptools.packages.find]
+where = ["reference"]

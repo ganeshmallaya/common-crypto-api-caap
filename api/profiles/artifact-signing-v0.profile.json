@@ -1,0 +1,43 @@
+{
+  "$schema": "../../schemas/algorithm-profile.schema.json",
+  "schemaVersion": "0.2.0-draft",
+  "profileId": "artifact-signing-v0",
+  "profileVersion": "0",
+  "status": "experimental",
+  "family": "signature",
+  "operations": ["CreateKey", "Sign", "Verify"],
+  "input": {
+    "interpretation": "message-bytes-signed-exactly-once",
+    "encoding": "base64-unpadded",
+    "emptyAllowed": false
+  },
+  "output": {
+    "type": "signature",
+    "encoding": "base64-unpadded"
+  },
+  "algorithms": [
+    {
+      "identifier": "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519",
+      "status": "implemented",
+      "references": [
+        "https://www.rfc-editor.org/rfc/rfc8032",
+        "https://www.rfc-editor.org/rfc/rfc9231"
+      ]
+    }
+  ],
+  "keyRequirements": {
+    "purpose": "sign",
+    "privateMaterialReturned": false,
+    "opaqueReference": true,
+    "states": ["active"]
+  },
+  "securityNotes": [
+    "Message signing and digest signing are distinct operation profiles.",
+    "The reference provider stores private keys only in process memory.",
+    "This profile has no portable conformance or hardware-assurance claim."
+  ],
+  "references": [
+    "https://www.rfc-editor.org/rfc/rfc8032",
+    "https://www.rfc-editor.org/rfc/rfc9231"
+  ]
+}

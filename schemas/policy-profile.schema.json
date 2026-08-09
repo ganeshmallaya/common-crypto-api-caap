@@ -1,145 +1,39 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/caap/schemas/policy-profile.schema.json",
+  "$id": "https://ganeshmallaya.github.io/common-crypto-api-caap/schemas/policy-profile.schema.json",
   "title": "CAAP experimental policy profile",
-  "description": "Research model only; not a normative CAAP binding.",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schemaVersion",
-    "profileId",
-    "profileVersion",
-    "status",
-    "rules"
-  ],
+  "required": ["schemaVersion", "profileId", "profileVersion", "status", "effectiveAt", "rules"],
   "properties": {
-    "$schema": {
-      "type": "string"
-    },
-    "schemaVersion": {
-      "type": "string",
-      "const": "0.1.0"
-    },
-    "profileId": {
-      "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9.-]{2,127}$"
-    },
-    "profileVersion": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 64
-    },
-    "status": {
-      "enum": ["draft", "active", "retired", "withdrawn"]
-    },
-    "effectiveAt": {
-      "type": ["string", "null"],
-      "format": "date-time"
-    },
-    "expiresAt": {
-      "type": ["string", "null"],
-      "format": "date-time"
-    },
+    "$schema": {"type": "string"},
+    "schemaVersion": {"const": "0.2.0-draft"},
+    "profileId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{2,127}$"},
+    "profileVersion": {"type": "string", "minLength": 1, "maxLength": 64},
+    "status": {"enum": ["draft", "active", "retired", "withdrawn"]},
+    "effectiveAt": {"type": "string", "format": "date-time"},
+    "expiresAt": {"type": ["string", "null"], "format": "date-time"},
     "rules": {
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "#/$defs/rule"
-      }
-    }
-  },
-  "$defs": {
-    "algorithmReference": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["namespace", "identifier"],
-      "properties": {
-        "namespace": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128
-        },
-        "identifier": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
-        },
-        "parameters": {
-          "type": "object"
-        }
-      }
-    },
-    "providerConstraints": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "allowedProviderClasses": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "enum": ["software", "hsm", "kms", "key-store"]
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ruleId", "intent", "operations", "decision"],
+        "properties": {
+          "ruleId": {"type": "string"},
+          "intent": {"const": "artifact-signing"},
+          "operations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify"]}},
+          "decision": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["profile", "algorithm", "allowedProviderClasses"],
+            "properties": {
+              "profile": {"const": "artifact-signing-v0"},
+              "algorithm": {"const": "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519"},
+              "allowedProviderClasses": {"type": "array", "contains": {"const": "software"}, "items": {"enum": ["software", "hsm", "kms"]}}
+            }
           }
-        },
-        "requiredKeyProperties": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64
-          }
-        }
-      }
-    },
-    "decision": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["algorithm"],
-      "properties": {
-        "algorithm": {
-          "$ref": "#/$defs/algorithmReference"
-        },
-        "providerConstraints": {
-          "$ref": "#/$defs/providerConstraints"
-        }
-      }
-    },
-    "rule": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["ruleId", "intent", "operations", "decision"],
-      "properties": {
-        "ruleId": {
-          "type": "string",
-          "pattern": "^[a-z0-9][a-z0-9.-]{2,127}$"
-        },
-        "intent": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]{2,127}$"
-        },
-        "operations": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "enum": [
-              "GetCapabilities",
-              "ResolvePolicy",
-              "GenerateKeyPair",
-              "Sign",
-              "Verify",
-              "Encapsulate",
-              "Decapsulate"
-            ]
-          }
-        },
-        "context": {
-          "type": "object",
-          "description": "Deployment-defined match inputs; body values are not trusted as caller identity."
-        },
-        "decision": {
-          "$ref": "#/$defs/decision"
         }
       }
     }

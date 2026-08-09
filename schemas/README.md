@@ -1,12 +1,17 @@
 # Experimental schemas
 
-These JSON Schemas are research aids for testing the CAAP object model. They do
-not select a normative wire format and do not establish interoperability.
+These JSON Schema 2020-12 documents support the `0.2.0-draft` research slice.
+The OpenAPI document is the candidate HTTP binding; the prose specification
+controls when a schema cannot express a semantic requirement.
 
-- `policy-profile.schema.json` models versioned intent-to-choice rules.
-- `protocol-envelope.schema.json` models candidate request and response
-  metadata.
-- `site-manifest.schema.json` defines the public website export gate.
+The request schema uses operation-specific conditional validation rather than
+accepting an arbitrary `input` object. Repository tests validate checked-in
+examples and reference-service requests against these schemas.
 
-Examples use the reserved `example.invalid` domain or explicitly local
-namespaces so they cannot be mistaken for registered algorithm identifiers.
+`algorithm-profile.schema.json` defines source-backed profile records;
+`operation-registry.schema.json` defines the cross-family maturity and behavior
+index. Both remain experimental knowledge-base inputs rather than policy.
+
+The schemas are not a normative wire format or a conformance claim. Promotion
+still requires canonical vectors, compatibility rules, and independent
+implementation results.

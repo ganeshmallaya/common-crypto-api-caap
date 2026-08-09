@@ -5,8 +5,8 @@ Status: initial research threat model
 ## Scope
 
 This model covers the CAAP consumer, broker, policy path, provider adapter,
-cryptographic backend, and public-export boundary. It does not prove that a
-particular deployment is secure.
+cryptographic backend, and research-site publication boundary. It does not prove
+that a particular deployment is secure.
 
 ## Protected assets
 
@@ -29,8 +29,7 @@ particular deployment is secure.
 - A malicious, compromised, or incorrectly configured provider
 - A cross-tenant attacker
 - An operator making an unsafe policy or lifecycle change
-- A supply-chain attacker modifying code, schemas, dependencies, or export
-  content
+- A supply-chain attacker modifying code, schemas, dependencies, or site content
 - A website pipeline copying unreviewed research material
 
 ## Trust-boundary threats and candidate controls
@@ -49,7 +48,7 @@ particular deployment is secure.
 | Secret leakage | Runtime and observability | No secrets in logs, protected secret delivery, memory handling, least privilege, redaction tests |
 | Denial of service | Network, broker, provider | Admission control, quotas, bounded work, timeouts, circuit breakers, capacity isolation |
 | Audit deletion or forgery | Broker and audit sink | Restricted write path, integrity protection, secure time, retention, independent monitoring |
-| Unreviewed website publication | Repository and website | Export allowlist, `reviewed` gate, pinned source commit, explicit approval, no runtime fetch |
+| Unreviewed website publication | Repository and website | `site/` allowlist, protected branch, manual Pages workflow, explicit approval, no runtime fetch |
 
 ## Important abuse cases
 
@@ -80,9 +79,9 @@ tenant authorization independent of identifier possession.
 
 ### Draft publication
 
-A website job copies research text directly from a branch or working tree. The
-public boundary needs a reviewed manifest, pinned commit, allowlisted paths, and
-an explicit promotion step.
+A website job publishes research text from an unreviewed branch or working tree.
+The public boundary needs a protected source branch, allowlisted `site/` path,
+manual deployment, recorded source commit, and explicit approval.
 
 ## Out of scope for this version
 
@@ -96,5 +95,5 @@ an explicit promotion step.
 ## Validation work required
 
 This threat model should drive negative protocol tests, policy-conflict tests,
-tenant-isolation tests, replay tests, export-gate tests, and deployment-specific
+tenant-isolation tests, replay tests, publication-gate tests, and deployment-specific
 reviews. None are claimed complete merely because they are listed here.

@@ -1,0 +1,15 @@
+{
+  "apiVersion": "0.2.0-draft",
+  "requestId": "example-create-0001",
+  "operation": "CreateKey",
+  "intent": "artifact-signing",
+  "expectedPolicy": {
+    "profileId": "baseline-artifact-signing",
+    "profileVersion": "1"
+  },
+  "minimumConstraints": {
+    "profile": "artifact-signing-v0",
+    "providerClasses": ["software"]
+  },
+  "input": {"purpose": "sign"}
+}

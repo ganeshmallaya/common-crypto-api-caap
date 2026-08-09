@@ -1,0 +1,375 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CAAP Common Crypto API — reference HTTP binding",
+    "version": "0.2.0-draft",
+    "description": "Typed HTTP/JSON binding for the implemented artifact-signing research slice. Cross-family candidate semantics are defined in spec/operation-contracts.md. This document is not production guidance or a conformance claim.",
+    "license": {
+      "name": "Proprietary — all rights reserved"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8080",
+      "description": "Local development only"
+    }
+  ],
+  "tags": [
+    {"name": "Service"},
+    {"name": "Discovery"},
+    {"name": "Policy"},
+    {"name": "Keys"},
+    {"name": "Signature"}
+  ],
+  "security": [
+    {"developmentBearer": []},
+    {}
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "operationId": "health",
+        "summary": "Report process liveness",
+        "tags": ["Service"],
+        "x-caap-maturity": "implemented",
+        "responses": {
+          "200": {
+            "description": "Process is running",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HealthResponse"}}}
+          },
+          "401": {"$ref": "#/components/responses/Unauthenticated"}
+        }
+      }
+    },
+    "/v1/capabilities": {
+      "get": {
+        "operationId": "getCapabilities",
+        "summary": "Return the scoped capabilities of this reference process",
+        "tags": ["Discovery"],
+        "x-caap-maturity": "implemented",
+        "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
+        "responses": {
+          "200": {
+            "description": "Reference capabilities and explicit limitations",
+            "headers": {"Cache-Control": {"$ref": "#/components/headers/NoStore"}},
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CapabilityResponse"}}}
+          },
+          "401": {"$ref": "#/components/responses/Unauthenticated"}
+        }
+      }
+    },
+    "/v1/policies:resolve": {
+      "post": {
+        "operationId": "resolvePolicy",
+        "summary": "Resolve and pin the artifact-signing policy",
+        "tags": ["Policy"],
+        "x-caap-maturity": "implemented",
+        "x-caap-profile": "artifact-signing-v0",
+        "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
+        "requestBody": {"$ref": "#/components/requestBodies/ResolvePolicyRequest"},
+        "responses": {
+          "200": {"description": "Pinned policy decision", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ResolvePolicyResponse"}}}},
+          "4XX": {"$ref": "#/components/responses/ClientError"},
+          "501": {"$ref": "#/components/responses/NotImplemented"}
+        }
+      }
+    },
+    "/v1/keys": {
+      "post": {
+        "operationId": "createKey",
+        "summary": "Create an in-memory Ed25519 signing key",
+        "tags": ["Keys"],
+        "x-caap-maturity": "implemented",
+        "x-caap-profile": "artifact-signing-v0",
+        "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
+        "requestBody": {"$ref": "#/components/requestBodies/CreateKeyRequest"},
+        "responses": {
+          "201": {"description": "Opaque key reference and public metadata", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateKeyResponse"}}}},
+          "4XX": {"$ref": "#/components/responses/ClientError"},
+          "501": {"$ref": "#/components/responses/NotImplemented"}
+        }
+      }
+    },
+    "/v1/keys/{keyRef}": {
+      "get": {
+        "operationId": "readKey",
+        "summary": "Read authorized non-secret key metadata",
+        "tags": ["Keys"],
+        "x-caap-maturity": "implemented",
+        "parameters": [
+          {"$ref": "#/components/parameters/KeyRef"},
+          {"$ref": "#/components/parameters/DevelopmentTenant"}
+        ],
+        "responses": {
+          "200": {"description": "Non-secret key metadata", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KeyMetadata"}}}},
+          "401": {"$ref": "#/components/responses/Unauthenticated"},
+          "404": {"$ref": "#/components/responses/ClientError"}
+        }
+      }
+    },
+    "/v1/sign": {
+      "post": {
+        "operationId": "sign",
+        "summary": "Sign message bytes exactly once",
+        "tags": ["Signature"],
+        "x-caap-maturity": "implemented",
+        "x-caap-profile": "artifact-signing-v0",
+        "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
+        "requestBody": {"$ref": "#/components/requestBodies/SignRequest"},
+        "responses": {
+          "200": {"description": "Signature and decision evidence", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SignResponse"}}}},
+          "4XX": {"$ref": "#/components/responses/ClientError"},
+          "501": {"$ref": "#/components/responses/NotImplemented"}
+        }
+      }
+    },
+    "/v1/verify": {
+      "post": {
+        "operationId": "verify",
+        "summary": "Verify a signature over message bytes",
+        "tags": ["Signature"],
+        "x-caap-maturity": "implemented",
+        "x-caap-profile": "artifact-signing-v0",
+        "parameters": [{"$ref": "#/components/parameters/DevelopmentTenant"}],
+        "requestBody": {"$ref": "#/components/requestBodies/VerifyRequest"},
+        "responses": {
+          "200": {"description": "Boolean verification result and decision evidence", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/VerifyResponse"}}}},
+          "4XX": {"$ref": "#/components/responses/ClientError"},
+          "501": {"$ref": "#/components/responses/NotImplemented"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "developmentBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Optional development-only bearer token enabled with CAAP_AUTH_TOKEN. Production CAAP deployments require an authenticated workload identity and channel binding."
+      }
+    },
+    "parameters": {
+      "DevelopmentTenant": {
+        "name": "X-CAAP-Tenant",
+        "in": "header",
+        "required": false,
+        "description": "Development test-harness tenant. It is not trusted authentication and defaults to local-dev.",
+        "schema": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$", "default": "local-dev"}
+      },
+      "KeyRef": {
+        "name": "keyRef",
+        "in": "path",
+        "required": true,
+        "description": "Opaque tenant-bound key reference",
+        "schema": {"$ref": "#/components/schemas/KeyRef"}
+      }
+    },
+    "headers": {
+      "NoStore": {
+        "description": "Reference responses are not cacheable",
+        "schema": {"type": "string", "const": "no-store"}
+      }
+    },
+    "requestBodies": {
+      "ResolvePolicyRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ResolvePolicyRequest"}}}},
+      "CreateKeyRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateKeyRequest"}}}},
+      "SignRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SignRequest"}}}},
+      "VerifyRequest": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/VerifyRequest"}}}}
+    },
+    "responses": {
+      "ClientError": {
+        "description": "Explicit CAAP request, authorization, policy, capability, or key failure",
+        "headers": {"Cache-Control": {"$ref": "#/components/headers/NoStore"}},
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}
+      },
+      "Unauthenticated": {
+        "description": "Development bearer authentication failed when enabled",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}
+      },
+      "NotImplemented": {
+        "description": "Recognized operation is not implemented by this reference service",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}
+      }
+    },
+    "schemas": {
+      "ApiVersion": {"type": "string", "const": "0.2.0-draft"},
+      "RequestId": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{8,128}$"},
+      "Intent": {"type": "string", "const": "artifact-signing"},
+      "Profile": {"type": "string", "const": "artifact-signing-v0"},
+      "Algorithm": {"type": "string", "const": "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519"},
+      "ProviderRef": {"type": "string", "const": "software:python-cryptography"},
+      "KeyRef": {"type": "string", "pattern": "^key_[A-Za-z0-9_-]{16,128}$"},
+      "CanonicalBase64": {"type": "string", "minLength": 2, "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}|[A-Za-z0-9+/]{3})?$", "description": "Canonical non-empty unpadded base64. Padding and impossible encoded lengths are rejected."},
+      "PolicyReference": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["profileId", "profileVersion"],
+        "properties": {
+          "profileId": {"type": "string", "minLength": 1, "maxLength": 128},
+          "profileVersion": {"type": "string", "minLength": 1, "maxLength": 64}
+        }
+      },
+      "MinimumConstraints": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "profile": {"$ref": "#/components/schemas/Profile"},
+          "providerClasses": {"type": "array", "uniqueItems": true, "minItems": 1, "items": {"enum": ["software", "hsm", "kms"]}}
+        }
+      },
+      "CommonRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["apiVersion", "requestId", "operation", "intent", "minimumConstraints", "input"],
+        "properties": {
+          "apiVersion": {"$ref": "#/components/schemas/ApiVersion"},
+          "requestId": {"$ref": "#/components/schemas/RequestId"},
+          "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify"]},
+          "intent": {"$ref": "#/components/schemas/Intent"},
+          "expectedPolicy": {"$ref": "#/components/schemas/PolicyReference"},
+          "minimumConstraints": {"$ref": "#/components/schemas/MinimumConstraints"},
+          "input": {"type": "object"}
+        }
+      },
+      "ResolvePolicyRequest": {
+        "allOf": [
+          {"$ref": "#/components/schemas/CommonRequest"},
+          {"type": "object", "properties": {"operation": {"const": "ResolvePolicy"}, "input": {"type": "object", "maxProperties": 0}}}
+        ]
+      },
+      "CreateKeyRequest": {
+        "allOf": [
+          {"$ref": "#/components/schemas/CommonRequest"},
+          {"type": "object", "properties": {"operation": {"const": "CreateKey"}, "input": {"$ref": "#/components/schemas/CreateKeyInput"}}}
+        ]
+      },
+      "SignRequest": {
+        "allOf": [
+          {"$ref": "#/components/schemas/CommonRequest"},
+          {"type": "object", "properties": {"operation": {"const": "Sign"}, "input": {"$ref": "#/components/schemas/SignInput"}}}
+        ]
+      },
+      "VerifyRequest": {
+        "allOf": [
+          {"$ref": "#/components/schemas/CommonRequest"},
+          {"type": "object", "properties": {"operation": {"const": "Verify"}, "input": {"$ref": "#/components/schemas/VerifyInput"}}}
+        ]
+      },
+      "CreateKeyInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["purpose"],
+        "properties": {"purpose": {"const": "sign"}}
+      },
+      "SignInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["keyRef", "message"],
+        "properties": {"keyRef": {"$ref": "#/components/schemas/KeyRef"}, "message": {"$ref": "#/components/schemas/CanonicalBase64"}}
+      },
+      "VerifyInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["keyRef", "message", "signature"],
+        "properties": {"keyRef": {"$ref": "#/components/schemas/KeyRef"}, "message": {"$ref": "#/components/schemas/CanonicalBase64"}, "signature": {"$ref": "#/components/schemas/CanonicalBase64"}}
+      },
+      "Decision": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["policy", "profile", "algorithm", "providerRef"],
+        "properties": {
+          "policy": {"$ref": "#/components/schemas/PolicyReference"},
+          "profile": {"$ref": "#/components/schemas/Profile"},
+          "algorithm": {"$ref": "#/components/schemas/Algorithm"},
+          "providerRef": {"$ref": "#/components/schemas/ProviderRef"}
+        }
+      },
+      "Evidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidenceId", "decisionAt", "executedAt"],
+        "properties": {
+          "evidenceId": {"type": "string", "pattern": "^evt_[a-f0-9]{24}$"},
+          "decisionAt": {"type": "string", "format": "date-time"},
+          "executedAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "SuccessEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["apiVersion", "requestId", "operation", "outcome", "decision", "result", "evidence"],
+        "properties": {
+          "apiVersion": {"$ref": "#/components/schemas/ApiVersion"},
+          "requestId": {"$ref": "#/components/schemas/RequestId"},
+          "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify"]},
+          "outcome": {"const": "success"},
+          "decision": {"$ref": "#/components/schemas/Decision"},
+          "result": {"type": "object"},
+          "evidence": {"$ref": "#/components/schemas/Evidence"}
+        }
+      },
+      "ResolvePolicyResponse": {
+        "allOf": [{"$ref": "#/components/schemas/SuccessEnvelope"}, {"type": "object", "properties": {"operation": {"const": "ResolvePolicy"}, "result": {"type": "object", "additionalProperties": false, "required": ["resolved"], "properties": {"resolved": {"const": true}}}}}]
+      },
+      "KeyMetadata": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["keyRef", "keyVersion", "purpose", "state", "profile", "algorithm", "providerRef", "publicKey", "publicKeyEncoding", "createdAt"],
+        "properties": {
+          "keyRef": {"$ref": "#/components/schemas/KeyRef"},
+          "keyVersion": {"type": "integer", "minimum": 1},
+          "purpose": {"const": "sign"},
+          "state": {"const": "active"},
+          "profile": {"$ref": "#/components/schemas/Profile"},
+          "algorithm": {"$ref": "#/components/schemas/Algorithm"},
+          "providerRef": {"$ref": "#/components/schemas/ProviderRef"},
+          "publicKey": {"$ref": "#/components/schemas/CanonicalBase64"},
+          "publicKeyEncoding": {"const": "raw-base64-unpadded"},
+          "createdAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CreateKeyResponse": {
+        "allOf": [{"$ref": "#/components/schemas/SuccessEnvelope"}, {"type": "object", "properties": {"operation": {"const": "CreateKey"}, "result": {"$ref": "#/components/schemas/KeyMetadata"}}}]
+      },
+      "SignResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["keyRef", "keyVersion", "signature", "encoding"],
+        "properties": {"keyRef": {"$ref": "#/components/schemas/KeyRef"}, "keyVersion": {"type": "integer", "minimum": 1}, "signature": {"$ref": "#/components/schemas/CanonicalBase64"}, "encoding": {"const": "base64-unpadded"}}
+      },
+      "SignResponse": {
+        "allOf": [{"$ref": "#/components/schemas/SuccessEnvelope"}, {"type": "object", "properties": {"operation": {"const": "Sign"}, "result": {"$ref": "#/components/schemas/SignResult"}}}]
+      },
+      "VerifyResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["keyRef", "keyVersion", "valid"],
+        "properties": {"keyRef": {"$ref": "#/components/schemas/KeyRef"}, "keyVersion": {"type": "integer", "minimum": 1}, "valid": {"type": "boolean"}}
+      },
+      "VerifyResponse": {
+        "allOf": [{"$ref": "#/components/schemas/SuccessEnvelope"}, {"type": "object", "properties": {"operation": {"const": "Verify"}, "result": {"$ref": "#/components/schemas/VerifyResult"}}}]
+      },
+      "CapabilityResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["apiVersion", "generatedAt", "validUntil", "scope", "profiles", "limitations"],
+        "properties": {
+          "apiVersion": {"$ref": "#/components/schemas/ApiVersion"},
+          "generatedAt": {"type": "string", "format": "date-time"},
+          "validUntil": {"type": "string", "format": "date-time"},
+          "scope": {"type": "object", "additionalProperties": false, "required": ["tenant", "audience"], "properties": {"tenant": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$"}, "audience": {"const": "caller"}}},
+          "profiles": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["profile", "operations", "algorithms", "providerClasses", "providerRef", "keyProtections"], "properties": {"profile": {"$ref": "#/components/schemas/Profile"}, "operations": {"type": "array", "items": {"enum": ["CreateKey", "Sign", "Verify"]}, "uniqueItems": true}, "algorithms": {"type": "array", "items": {"$ref": "#/components/schemas/Algorithm"}, "uniqueItems": true}, "providerClasses": {"type": "array", "items": {"const": "software"}, "uniqueItems": true}, "providerRef": {"$ref": "#/components/schemas/ProviderRef"}, "keyProtections": {"type": "array", "items": {"const": "software-memory"}, "uniqueItems": true}}}},
+          "limitations": {"type": "array", "items": {"enum": ["research-only", "in-memory-keys", "single-provider", "no-idempotency-store", "no-conformance-claim"]}, "uniqueItems": true}
+        }
+      },
+      "HealthResponse": {"type": "object", "additionalProperties": false, "required": ["status"], "properties": {"status": {"const": "ok"}}},
+      "ErrorCategory": {"enum": ["INVALID_REQUEST", "UNAUTHENTICATED", "UNAUTHORIZED", "POLICY_NOT_FOUND", "POLICY_AMBIGUOUS", "POLICY_INACTIVE", "CONSTRAINT_MISMATCH", "CAPABILITY_MISMATCH", "KEY_STATE_INVALID", "STATE_CONFLICT", "IDEMPOTENCY_CONFLICT", "AUTHENTICATION_FAILED", "OUTPUT_RESTRICTED", "RATE_LIMITED", "PROVIDER_UNAVAILABLE", "OPERATION_FAILED", "NOT_IMPLEMENTED"]},
+      "ErrorEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["error"],
+        "properties": {"error": {"type": "object", "additionalProperties": false, "required": ["category", "message", "retryable"], "properties": {"category": {"$ref": "#/components/schemas/ErrorCategory"}, "message": {"type": "string", "minLength": 1}, "retryable": {"type": "boolean"}}}}
+      }
+    }
+  }
+}

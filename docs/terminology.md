@@ -27,7 +27,7 @@ definitions in external standards.
 | **HSM** | Hardware security module. Product-specific capability is not implied. |
 | **KMS** | Key management service. Product-specific capability is not implied. |
 | **Key store** | A system that retains keys or key references and enforces access or lifecycle controls. |
-| **Public export** | Reviewed content copied from `public-export/` to a separate public website at a pinned repository commit. |
+| **Research site** | Static content in `site/`, deployed from this repository only after explicit approval. |
 
 ## Normative language
 

@@ -90,17 +90,18 @@ policy; it must be authenticated, time-bounded, auditable, and constrained.
 
 ## Implementation and supply chain
 
-Future implementations need dependency review, secure update mechanisms,
+Production-capable implementations need dependency review, secure update mechanisms,
 secret scanning, reproducible interface artifacts where practical, and tests
 that compare prose, schemas, and code. A reference implementation demonstrates
 one interpretation; it does not prove that the design or cryptography is safe.
 
-## Public export
+## Research-site publication
 
 Research drafts may discuss unresolved weaknesses and must not become public by
-accident. Only allowlisted files under `public-export/`, at a pinned commit with
-status `reviewed`, are eligible for copying. Publication still requires explicit
-approval. The public website must not fetch repository content at runtime.
+accident. The static site under `site/` is the only deployable web content.
+Enabling Pages, changing a custom domain or DNS, and linking it from the personal
+site remain separate approval gates. Client-side copy deterrents are not access
+control and are disabled by default.
 
 ## Unresolved security decisions
 

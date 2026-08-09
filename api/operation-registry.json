@@ -1,0 +1,49 @@
+{
+  "$schema": "../schemas/operation-registry.schema.json",
+  "registryVersion": "0.2.0-draft",
+  "status": "experimental",
+  "operations": [
+    {"name": "GetCapabilities", "family": "discovery", "maturity": "implemented", "requestClass": "read", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
+    {"name": "ListProfiles", "family": "discovery", "maturity": "specified", "requestClass": "read", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
+    {"name": "ResolvePolicy", "family": "policy", "maturity": "implemented", "requestClass": "execution", "mutatesState": false, "keyMaterial": "none", "retryDefault": "conditional", "referenceProfile": "artifact-signing-v0"},
+    {"name": "DryRunPolicy", "family": "policy", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
+
+    {"name": "CreateKey", "family": "key", "maturity": "implemented", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional", "referenceProfile": "artifact-signing-v0"},
+    {"name": "ReadKey", "family": "key", "maturity": "implemented", "requestClass": "read", "mutatesState": false, "keyMaterial": "public", "retryDefault": "safe", "referenceProfile": "artifact-signing-v0"},
+    {"name": "ListKeys", "family": "key", "maturity": "specified", "requestClass": "read", "mutatesState": false, "keyMaterial": "public", "retryDefault": "safe"},
+    {"name": "RotateKey", "family": "key", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "TransformKey", "family": "key", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "MigrateKey", "family": "key", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "ImportKey", "family": "key", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "protected-output", "retryDefault": "conditional"},
+    {"name": "ExportKey", "family": "key", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "protected-output", "retryDefault": "conditional"},
+    {"name": "SetKeyState", "family": "key", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "DestroyKey", "family": "key", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+
+    {"name": "Sign", "family": "signature", "maturity": "implemented", "requestClass": "execution", "mutatesState": false, "keyMaterial": "reference", "retryDefault": "conditional", "referenceProfile": "artifact-signing-v0"},
+    {"name": "Verify", "family": "signature", "maturity": "implemented", "requestClass": "execution", "mutatesState": false, "keyMaterial": "public", "retryDefault": "safe", "referenceProfile": "artifact-signing-v0"},
+    {"name": "SignDigest", "family": "signature", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "VerifyDigest", "family": "signature", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "public", "retryDefault": "safe"},
+
+    {"name": "GenerateMac", "family": "mac", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "VerifyMac", "family": "mac", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "reference", "retryDefault": "safe"},
+    {"name": "Encrypt", "family": "encryption", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "reference", "retryDefault": "do-not-reexecute"},
+    {"name": "Decrypt", "family": "encryption", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "reference", "retryDefault": "conditional"},
+
+    {"name": "Digest", "family": "digest", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
+    {"name": "ExpandOutput", "family": "digest", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "none", "retryDefault": "safe"},
+    {"name": "GenerateRandom", "family": "random", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "none", "retryDefault": "do-not-reexecute"},
+
+    {"name": "DeriveKey", "family": "establishment", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "DeriveBytes", "family": "establishment", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "protected-output", "retryDefault": "conditional"},
+    {"name": "AgreeKey", "family": "establishment", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "Encapsulate", "family": "establishment", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "do-not-reexecute"},
+    {"name": "Decapsulate", "family": "establishment", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "WrapKey", "family": "establishment", "maturity": "specified", "requestClass": "execution", "mutatesState": false, "keyMaterial": "protected-output", "retryDefault": "conditional"},
+    {"name": "UnwrapKey", "family": "establishment", "maturity": "specified", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+
+    {"name": "BeginOperation", "family": "streaming", "maturity": "reserved", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "UpdateOperation", "family": "streaming", "maturity": "reserved", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "FinalizeOperation", "family": "streaming", "maturity": "reserved", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "conditional"},
+    {"name": "AbortOperation", "family": "streaming", "maturity": "reserved", "requestClass": "execution", "mutatesState": true, "keyMaterial": "reference", "retryDefault": "safe"}
+  ]
+}

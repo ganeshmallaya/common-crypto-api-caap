@@ -1,210 +1,91 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/caap/schemas/protocol-envelope.schema.json",
-  "title": "CAAP experimental protocol envelope",
-  "description": "Research model only; not a normative CAAP binding.",
-  "oneOf": [
+  "$id": "https://ganeshmallaya.github.io/common-crypto-api-caap/schemas/protocol-envelope.schema.json",
+  "title": "CAAP Common Crypto API request",
+  "description": "Experimental request envelope for the implemented artifact-signing 0.2.0-draft HTTP slice.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "requestId", "operation", "intent", "minimumConstraints", "input"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "apiVersion": {"const": "0.2.0-draft"},
+    "requestId": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{8,128}$"},
+    "operation": {"enum": ["ResolvePolicy", "CreateKey", "Sign", "Verify"]},
+    "intent": {"const": "artifact-signing"},
+    "expectedPolicy": {"$ref": "#/$defs/policyReference"},
+    "minimumConstraints": {"$ref": "#/$defs/minimumConstraints"},
+    "input": {"type": "object"}
+  },
+  "allOf": [
     {
-      "$ref": "#/$defs/request"
+      "if": {"properties": {"operation": {"const": "ResolvePolicy"}}, "required": ["operation"]},
+      "then": {"properties": {"input": {"type": "object", "maxProperties": 0}}}
     },
     {
-      "$ref": "#/$defs/response"
+      "if": {"properties": {"operation": {"const": "CreateKey"}}, "required": ["operation"]},
+      "then": {"properties": {"input": {"$ref": "#/$defs/createKeyInput"}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "Sign"}}, "required": ["operation"]},
+      "then": {"properties": {"input": {"$ref": "#/$defs/signInput"}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "Verify"}}, "required": ["operation"]},
+      "then": {"properties": {"input": {"$ref": "#/$defs/verifyInput"}}}
     }
   ],
   "$defs": {
-    "operation": {
-      "enum": [
-        "GetCapabilities",
-        "ResolvePolicy",
-        "GenerateKeyPair",
-        "Sign",
-        "Verify",
-        "Encapsulate",
-        "Decapsulate"
-      ]
-    },
-    "algorithmReference": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["namespace", "identifier"],
-      "properties": {
-        "namespace": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128
-        },
-        "identifier": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
-        }
-      }
-    },
     "policyReference": {
       "type": "object",
       "additionalProperties": false,
       "required": ["profileId", "profileVersion"],
       "properties": {
-        "profileId": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128
-        },
-        "profileVersion": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+        "profileId": {"type": "string", "minLength": 1, "maxLength": 128},
+        "profileVersion": {"type": "string", "minLength": 1, "maxLength": 64}
+      }
+    },
+    "minimumConstraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "profile": {"const": "artifact-signing-v0"},
+        "providerClasses": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["software", "hsm", "kms"]}
         }
       }
     },
-    "request": {
+    "canonicalBase64": {
+      "type": "string",
+      "minLength": 2,
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}|[A-Za-z0-9+/]{3})?$"
+    },
+    "keyRef": {"type": "string", "pattern": "^key_[A-Za-z0-9_-]{16,128}$"},
+    "createKeyInput": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "kind",
-        "apiVersion",
-        "requestId",
-        "operation",
-        "intent",
-        "input"
-      ],
+      "required": ["purpose"],
+      "properties": {"purpose": {"const": "sign"}}
+    },
+    "signInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["keyRef", "message"],
       "properties": {
-        "$schema": {
-          "type": "string"
-        },
-        "kind": {
-          "const": "request"
-        },
-        "apiVersion": {
-          "type": "string",
-          "const": "0.1.0-experimental"
-        },
-        "requestId": {
-          "type": "string",
-          "pattern": "^[A-Za-z0-9._:-]{8,128}$"
-        },
-        "operation": {
-          "$ref": "#/$defs/operation"
-        },
-        "intent": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]{2,127}$"
-        },
-        "expectedPolicy": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/policyReference"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "minimumConstraints": {
-          "type": "object"
-        },
-        "input": {
-          "type": "object"
-        }
+        "keyRef": {"$ref": "#/$defs/keyRef"},
+        "message": {"$ref": "#/$defs/canonicalBase64"}
       }
     },
-    "response": {
+    "verifyInput": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "kind",
-        "apiVersion",
-        "requestId",
-        "operation",
-        "outcome"
-      ],
+      "required": ["keyRef", "message", "signature"],
       "properties": {
-        "$schema": {
-          "type": "string"
-        },
-        "kind": {
-          "const": "response"
-        },
-        "apiVersion": {
-          "type": "string",
-          "const": "0.1.0-experimental"
-        },
-        "requestId": {
-          "type": "string",
-          "pattern": "^[A-Za-z0-9._:-]{8,128}$"
-        },
-        "operation": {
-          "$ref": "#/$defs/operation"
-        },
-        "outcome": {
-          "enum": ["success", "rejected", "failed"]
-        },
-        "policy": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/policyReference"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "algorithm": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/algorithmReference"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "providerRef": {
-          "type": ["string", "null"],
-          "maxLength": 256
-        },
-        "result": {
-          "type": ["object", "null"]
-        },
-        "error": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/error"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      }
-    },
-    "error": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["category", "message"],
-      "properties": {
-        "category": {
-          "enum": [
-            "INVALID_REQUEST",
-            "UNAUTHORIZED",
-            "POLICY_NOT_FOUND",
-            "POLICY_AMBIGUOUS",
-            "POLICY_INACTIVE",
-            "CONSTRAINT_MISMATCH",
-            "CAPABILITY_MISMATCH",
-            "KEY_STATE_INVALID",
-            "PROVIDER_UNAVAILABLE",
-            "OPERATION_FAILED"
-          ]
-        },
-        "message": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 512
-        },
-        "retryable": {
-          "type": "boolean"
-        }
+        "keyRef": {"$ref": "#/$defs/keyRef"},
+        "message": {"$ref": "#/$defs/canonicalBase64"},
+        "signature": {"$ref": "#/$defs/canonicalBase64"}
       }
     }
   }

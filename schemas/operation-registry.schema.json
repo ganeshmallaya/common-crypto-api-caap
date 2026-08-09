@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ganeshmallaya.github.io/common-crypto-api-caap/schemas/operation-registry.schema.json",
+  "title": "CAAP experimental operation registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "registryVersion", "status", "operations"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "registryVersion": {"const": "0.2.0-draft"},
+    "status": {"const": "experimental"},
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "family", "maturity", "requestClass", "mutatesState", "keyMaterial", "retryDefault"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[A-Z][A-Za-z0-9]{2,63}$"},
+          "family": {"enum": ["discovery", "policy", "key", "signature", "mac", "encryption", "digest", "random", "establishment", "streaming"]},
+          "maturity": {"enum": ["implemented", "specified", "reserved"]},
+          "requestClass": {"enum": ["read", "execution"]},
+          "mutatesState": {"type": "boolean"},
+          "keyMaterial": {"enum": ["none", "reference", "public", "protected-output"]},
+          "retryDefault": {"enum": ["safe", "conditional", "do-not-reexecute"]},
+          "referenceProfile": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{2,127}$"}
+        }
+      }
+    }
+  }
+}

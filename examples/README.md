@@ -1,13 +1,8 @@
 # Examples
 
-These examples exercise the working object model. They are not test vectors,
-do not contain production identifiers or secrets, and do not demonstrate a
-working CAAP implementation.
+These files exercise the implemented research slice. Identifiers and payloads
+are non-production examples. Start the service, then run `quickstart.sh`.
 
-- `policy-profile.example.json` uses an explicitly unregistered example
-  algorithm namespace.
-- `resolve-policy-request.example.json` shows a dry-run request.
-- `resolve-policy-response.example.json` shows the corresponding conceptual
-  decision metadata.
-- `capabilities.example.json` shows a standalone provider capability object
-  that may inform—but never replace—authorization and policy.
+The script requires `curl`, Python 3, and a local service at
+`http://127.0.0.1:8080`. It creates an ephemeral key, signs a message, and
+verifies the signature. The key disappears when the service stops.

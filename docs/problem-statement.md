@@ -58,8 +58,7 @@ that layer, but they are not the CAAP thesis.
 - Claiming universal coverage for constrained devices, boot roots, or line-rate
   cryptographic datapaths.
 - Defining a certification program or claiming conformance.
-- Selecting a normative transport or interface definition language before the
-  operation and trust boundaries are reviewed.
+- Treating one experimental transport binding as the complete protocol.
 
 ## Evaluation questions
 
@@ -75,5 +74,6 @@ that layer, but they are not the CAAP thesis.
    weakening key-protection requirements?
 6. Which cryptographic workflows cannot safely fit this abstraction?
 
-Answers require schemas, test vectors, a reference implementation, and negative
-tests. This repository does not yet claim those results.
+The current artifact-signing slice supplies initial schemas, a reference
+implementation, and negative tests. It does not answer the independent-
+implementation, portability, or conformance questions.

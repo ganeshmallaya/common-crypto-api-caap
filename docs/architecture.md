@@ -98,8 +98,8 @@ ACME, CMP, EST, or other CA protocols.
    integrity.
 4. **Provider to backend:** backend credentials, key custody, mechanism
    translation, session isolation, and lifecycle state.
-5. **Research repository to public website:** human review, source-commit pin,
-   file allowlist, and copy integrity.
+5. **Research repository to hosted research site:** reviewed `site/` content,
+   branch protection, build provenance, and explicit publication approval.
 
 ## Deployment patterns
 

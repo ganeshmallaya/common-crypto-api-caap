@@ -1,0 +1,24 @@
+{
+  "redirects": [
+    {
+      "source": "/research",
+      "destination": "/research/crypto-agility-algorithm-protocol/",
+      "permanent": true
+    },
+    {
+      "source": "/research/crypto-agility-algorithm-protocol/protocol",
+      "destination": "/research/crypto-agility-algorithm-protocol/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/research/crypto-agility-algorithm-protocol",
+      "destination": "https://ganeshmallaya.github.io/common-crypto-api-caap/"
+    },
+    {
+      "source": "/research/crypto-agility-algorithm-protocol/:path*",
+      "destination": "https://ganeshmallaya.github.io/common-crypto-api-caap/:path*"
+    }
+  ]
+}
