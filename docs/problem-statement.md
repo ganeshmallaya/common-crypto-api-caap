@@ -28,6 +28,12 @@ A successful abstraction would make supported transitions policy-led while
 keeping the decision visible, attributable, testable, and reversible. It must
 not turn algorithm agility into an opaque fallback mechanism.
 
+The central research object is the abstraction layer itself: the consumer
+contract, provider contract, policy-decision boundary, broker enforcement
+behavior, and evidence required for two implementations to behave consistently.
+Inventory, migration orchestration, and certificate lifecycle systems may use
+that layer, but they are not the CAAP thesis.
+
 ## Goals
 
 - Separate application intent from algorithm and provider selection.

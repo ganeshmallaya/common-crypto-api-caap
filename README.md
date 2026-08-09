@@ -49,6 +49,12 @@ replace enrollment, issuance, revocation, or certificate-management protocols.
   trust boundaries, and threats.
 - [`docs/security-considerations.md`](docs/security-considerations.md) records
   security requirements and unresolved decisions.
+- [`docs/framework-v1.md`](docs/framework-v1.md) is the consolidated research
+  framework for the vendor-neutral cryptographic abstraction layer.
+- [`docs/control-plane-and-kmip.md`](docs/control-plane-and-kmip.md) separates
+  policy authority from broker enforcement and maps KMIP as a provider path.
+- [`docs/draft-alignment.md`](docs/draft-alignment.md) reviews the historical
+  first draft against the proposed revision 02 architecture.
 - [`docs/publication-workflow.md`](docs/publication-workflow.md) defines the
   versioned, copy-based website synchronization process.
 - [`schemas/`](schemas/) contains experimental JSON Schemas. They are research

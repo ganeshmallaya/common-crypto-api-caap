@@ -45,8 +45,12 @@ request when the decision, capabilities, or caller constraints do not agree.
 - Routes the operation and returns a structured result or error.
 - Emits security-relevant audit events without secrets.
 
-The broker is a policy enforcement point, not a source of cryptographic truth.
-It does not make an algorithm secure merely by selecting it.
+The broker is a policy enforcement point, not the unconstrained policy decision
+maker or a source of cryptographic truth. It has bounded operational
+intelligence: it validates context, matches authenticated capabilities, routes
+operations, manages logical references, and records evidence. The policy
+authority owns the risk decision. The broker does not make an algorithm secure
+merely by selecting it.
 
 ### Policy authority and resolver
 
@@ -68,6 +72,12 @@ specified, a deployment cannot claim downgrade-resistant policy distribution.
 
 Capability discovery is not authorization and does not guarantee that a later
 operation will succeed.
+
+A provider adapter may translate the southbound contract to PKCS#11, OASIS
+KMIP, a cloud KMS API, or a software-library API. That translation must preserve
+operation, parameter, object-state, authorization, key-custody, and error
+semantics. CAAP does not replace the underlying provider protocol. See
+[`control-plane-and-kmip.md`](control-plane-and-kmip.md).
 
 ### Certificate authority integration
 

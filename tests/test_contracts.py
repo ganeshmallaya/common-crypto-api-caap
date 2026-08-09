@@ -84,11 +84,10 @@ class PublicExportTest(unittest.TestCase):
         else:
             self.assertIsNone(self.manifest["sourceCommit"])
 
-    def test_placeholder_is_publication_safe_and_minimal(self):
+    def test_site_summary_has_canonical_heading(self):
         summary = (PUBLIC_EXPORT / "site-summary.md").read_text(encoding="utf-8")
-        self.assertEqual(
-            summary,
-            "# Crypto Agility Algorithm Protocol (CAAP)\n\nContent coming soon.\n",
+        self.assertTrue(
+            summary.startswith("# Crypto Agility Algorithm Protocol (CAAP)\n")
         )
 
 

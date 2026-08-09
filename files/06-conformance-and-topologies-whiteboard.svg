@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1000 720" xmlns="http://www.w3.org/2000/svg" font-family="Caveat, 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive">
+<defs>
+  <filter id="r1" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="3" seed="53" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.1" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="r2" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.036" numOctaves="2" seed="23" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.3" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</defs>
+
+<rect width="1000" height="720" fill="#fbfbf7"/>
+
+<!-- ===== conformance ladder ===== -->
+<g filter="url(#r2)">
+  <text x="40" y="48" font-size="28" fill="#22252b">Conformance ladder — claim a level, not a slogan</text>
+  <path d="M41 60 Q280 66 620 58" stroke="#2c7fb8" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+</g>
+
+<g filter="url(#r1)" stroke="#2c7fb8" stroke-width="2.8" fill="none" stroke-linecap="round">
+  <path d="M40 86 L340 82 L343 306 L42 310 Z"/>
+</g>
+<g filter="url(#r1)" stroke="#e0673a" stroke-width="2.8" fill="none" stroke-linecap="round">
+  <path d="M366 86 L666 82 L669 306 L368 310 Z"/>
+</g>
+<g filter="url(#r1)" stroke="#1f8a5f" stroke-width="2.8" fill="none" stroke-linecap="round">
+  <path d="M692 86 L960 82 L963 306 L694 310 Z"/>
+</g>
+
+<g filter="url(#r2)">
+  <text x="58" y="114" font-size="18" fill="#2c7fb8">LEVEL 0 — mandatory</text>
+  <text x="58" y="140" font-size="20" fill="#22252b">Core operations</text>
+  <text x="58" y="172" font-size="15" fill="#3d4148">GetCapabilities, GenerateKeyPair</text>
+  <text x="58" y="196" font-size="15" fill="#3d4148">Sign, Verify</text>
+  <text x="58" y="220" font-size="15" fill="#3d4148">Encapsulate, Decapsulate</text>
+  <text x="58" y="244" font-size="15" fill="#3d4148">ResolvePolicy as a dry run</text>
+  <text x="58" y="268" font-size="15" fill="#3d4148">Structured errors</text>
+  <text x="58" y="292" font-size="15" fill="#c0392b">No silent algorithm substitution</text>
+
+  <text x="384" y="114" font-size="18" fill="#e0673a">LEVEL 1 — optional</text>
+  <text x="384" y="140" font-size="20" fill="#22252b">Agility and hybrid</text>
+  <text x="384" y="172" font-size="15" fill="#3d4148">DeriveSecret, Wrap, Unwrap</text>
+  <text x="384" y="196" font-size="15" fill="#3d4148">At least one composite id</text>
+  <text x="384" y="220" font-size="15" fill="#3d4148">Registered combiner encoding</text>
+  <text x="384" y="244" font-size="15" fill="#3d4148">Live policy resolution</text>
+  <text x="384" y="268" font-size="15" fill="#3d4148">Algorithm transform on a handle</text>
+  <text x="384" y="292" font-size="15" fill="#e0673a">This is where agility becomes real</text>
+
+  <text x="710" y="114" font-size="18" fill="#1f8a5f">LEVEL 2 — optional</text>
+  <text x="710" y="140" font-size="20" fill="#22252b">Assured hardware</text>
+  <text x="710" y="172" font-size="15" fill="#3d4148">Non-extractable keys</text>
+  <text x="710" y="196" font-size="15" fill="#3d4148">FIPS backend attestation</text>
+  <text x="710" y="220" font-size="15" fill="#3d4148">Provider attestation format</text>
+  <text x="710" y="244" font-size="15" fill="#3d4148">Signed profile provenance</text>
+  <text x="710" y="268" font-size="15" fill="#3d4148">enforced, not advisory</text>
+  <text x="710" y="292" font-size="15" fill="#1f8a5f">Regulated workloads land here</text>
+</g>
+
+<g filter="url(#r1)" stroke="#8a8f98" stroke-width="2.2" fill="none" stroke-linecap="round">
+  <path d="M346 196 L362 196"/><path d="M354 190 L364 196 L354 202"/>
+  <path d="M672 196 L688 196"/><path d="M680 190 L690 196 L680 202"/>
+</g>
+
+<!-- ===== topologies ===== -->
+<g filter="url(#r2)">
+  <text x="40" y="368" font-size="28" fill="#22252b">Deployment topologies — same contracts, different placement</text>
+  <path d="M41 380 Q320 386 760 378" stroke="#7c5cbf" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+</g>
+
+<g filter="url(#r1)" stroke="#b8b3c9" stroke-width="2.4" fill="none" stroke-linecap="round">
+  <path d="M40 404 L268 400 L271 566 L42 570 Z"/>
+  <path d="M294 404 L522 400 L525 566 L296 570 Z"/>
+  <path d="M548 404 L776 400 L779 566 L550 570 Z"/>
+</g>
+<g filter="url(#r1)" stroke="#7c5cbf" stroke-width="2.8" fill="none" stroke-linecap="round">
+  <path d="M802 404 L960 400 L963 566 L804 570 Z"/>
+</g>
+
+<g filter="url(#r2)">
+  <text x="58" y="430" font-size="15" fill="#7c5cbf">TOPOLOGY A</text>
+  <text x="58" y="456" font-size="18" fill="#22252b">In-process library</text>
+  <text x="58" y="486" font-size="14" fill="#3d4148">Broker links into the app.</text>
+  <text x="58" y="508" font-size="14" fill="#3d4148">Lowest latency. No hop.</text>
+  <text x="58" y="540" font-size="13" fill="#8a8f98">Fits: latency-critical,</text>
+  <text x="58" y="558" font-size="13" fill="#8a8f98">single-tenant services</text>
+
+  <text x="312" y="430" font-size="15" fill="#7c5cbf">TOPOLOGY B</text>
+  <text x="312" y="456" font-size="18" fill="#22252b">Sidecar or daemon</text>
+  <text x="312" y="486" font-size="14" fill="#3d4148">Per pod or per host agent.</text>
+  <text x="312" y="508" font-size="14" fill="#3d4148">Apps use a local socket.</text>
+  <text x="312" y="540" font-size="13" fill="#8a8f98">Fits: Kubernetes, mesh,</text>
+  <text x="312" y="558" font-size="13" fill="#8a8f98">mixed-language estates</text>
+
+  <text x="566" y="430" font-size="15" fill="#7c5cbf">TOPOLOGY C</text>
+  <text x="566" y="456" font-size="18" fill="#22252b">Central service</text>
+  <text x="566" y="486" font-size="14" fill="#3d4148">Networked and HA.</text>
+  <text x="566" y="508" font-size="14" fill="#3d4148">One audit point.</text>
+  <text x="566" y="540" font-size="13" fill="#8a8f98">Fits: enterprise governance,</text>
+  <text x="566" y="558" font-size="13" fill="#8a8f98">shared HSM pools</text>
+
+  <text x="820" y="430" font-size="15" fill="#7c5cbf">TOPOLOGY D</text>
+  <text x="820" y="456" font-size="18" fill="#22252b">Tiered</text>
+  <text x="820" y="486" font-size="14" fill="#3d4148">Local broker for hot</text>
+  <text x="820" y="508" font-size="14" fill="#3d4148">operations. Central</text>
+  <text x="820" y="528" font-size="14" fill="#3d4148">policy and inventory.</text>
+  <text x="820" y="558" font-size="13" fill="#7c5cbf">The realistic default</text>
+</g>
+
+<!-- bottom rule -->
+<g filter="url(#r2)">
+  <path d="M40 610 L960 606" stroke="#c9cdd4" stroke-width="2" fill="none"/>
+  <text x="40" y="640" font-size="18" fill="#3d4148">A consumer written against Level 0 keeps working when a provider offers Level 2.</text>
+  <text x="40" y="666" font-size="18" fill="#3d4148">The topology changes the latency and the blast radius. It never changes the call.</text>
+  <text x="40" y="700" font-size="14" fill="#a8adb5">Common Crypto API · conformance and deployment · draft rev 02</text>
+</g>
+</svg>
